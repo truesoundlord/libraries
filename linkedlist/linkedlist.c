@@ -473,7 +473,7 @@ long lc_empty(ListeChainee *pListe)
 		lc_Datas *todel=lc_pop(pListe);
 		// juillet 2018 (décidé de faire mon possible pour éviter les memory leaks)
 		MemoryFreed+=todel->dataSize;
-		free(todel->value);
+		//free(todel->value);
 		free(todel);
 	}
 	pListe->pTail=pListe->pHead=NULL;
