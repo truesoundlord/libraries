@@ -5,7 +5,7 @@ libcssmarduino.o: 	libcssmarduino.c libcssmarduino.h
 sharedlibrary: 	libcssmarduino.c libcssmarduino.h 
 		@echo "Librairie partagée compilée..."
 		@echo "...installation au niveau du système d'exploitation !!"
-		gcc -c -fPIC -O3 libcssmarduino.c -o libcssmwide.o
+		gcc -c -fPIC -O3 libcssmarduino.c -o libcssmarduino.o
 		@echo "...compilation de la librairie..."
 		gcc -shared -Wl,-soname,libcssmarduino.so libcssmarduino.o -lpthread -lm -o libcssmarduino.so.0.0.1
 		@cp -v libcssmarduino.so.0.0.1 /usr/lib64
