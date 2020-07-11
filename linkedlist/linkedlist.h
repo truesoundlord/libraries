@@ -7,21 +7,22 @@ static unsigned int gen_Number=1000;                            // pour pouvoir 
 
 typedef struct item_Datas
 {
-	int                 item_Number;
-	int                 dataSize;
+	unsigned int        item_Number;
+	unsigned int        dataSize;
 	int                 dataType;
-	void                *value;
 	struct item_Datas   *pPrevious;
 	struct item_Datas   *pNext;
+	
+	void	*value;
   
   // pointeur de fonction
 	void                (*pDisplay)(void*);												// pour pouvoir afficher des données du standard ANSI C et celles définies par l'utilisateur...
-	void								(*Free)(void*);
+	void								(*pFree)(void*);
 }lc_Datas;
 
 typedef struct 
 {
-	int         NbElem;
+	unsigned int	NbElem;
 	lc_Datas    *pHead;
 	lc_Datas    *pTail;
 }ListeChainee;
@@ -31,9 +32,9 @@ typedef struct s_array																					// encapsulation d'un tableau
 {
 	void	*pBaseAddress;
 	
-	int		sizex;
-	int		sizey;
-	int		sizez;
+	unsigned int		sizex;
+	unsigned int		sizey;
+	unsigned int		sizez;
 		
 }t_cssmarray;
 

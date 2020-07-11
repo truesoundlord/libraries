@@ -4,9 +4,24 @@
 
 #ifndef __LINKEDLIST__
 #include "linkedlist.h"
-
-//#define DEBUG                                                                // il faut que le numéro de "l'objet" soit UNIQUE...
 #endif
+
+//*****************************************************************************
+// HISTORIQUE perdu avant 2020 :{
+
+// juillet 2020
+// Je vais avoir des soucis pour mes fonctions de recherche si le nombre d'éléments est
+// élevé...
+
+// Il y a un soucis avec les variables globales qui pourraient être modifiées
+// dans le cadre des threads... <TODO: essayer de "locker">
+
+
+//*****************************************************************************
+
+//*****************************************************************************
+// IMPLEMENTATIONS
+//*****************************************************************************
 
 //*****************************************************************************
 // lc_get
@@ -14,7 +29,7 @@
 // ENTREE(S):
 //
 // 	pListe: 		pointeur sur un élément de type ListeChainee
-// 	position: 	indice de l'élément que l'on veut "extraire"
+// 	position: 	indice de l'élément que l'on veut "extraire" (base index = 0)
 //
 // SORTIE:
 //	
@@ -22,29 +37,63 @@
 //
 //*****************************************************************************
 
+// En cas de présence de TRES nombreux éléments dans la liste
+// EXEMPLE:
+
+/* 
+ * Searching for 81871                                                                                                                                                
+       [FOUND] 1800604738                                                                                                                                             
+       [PERF 0] 0,001047 second                                                                                                                                       
+Searching for 05143                                                                                                                                                   
+       [FOUND] 231994623                                                                                                                                              
+       [PERF 1] 0,000050 second                                                                                                                                       
+Searching for 08558                                                                                                                                                   
+       [FOUND] 1962308680                                                                                                                                             
+       [PERF 2] 0,000073 second                                                                                                                                       
+Searching for 17589                                                                                                                                                   
+       [FOUND] 1081889810                                                                                                                                             
+       [PERF 3] 0,000147 second                                                                                                                                       
+Searching for 79626                                                                                                                                                   
+       [FOUND] 651197885                                                                                                                                              
+       [PERF 4] 0,000741 second
+*/
+
+// Il serait préférable de commencer à chercher par la fin pTail
+// au lieu de pHead !!!
+
+// Juiller 2020: tentative de recherche en fonction de l'item
+// TODO : exécuter un thread et collecter serait peut-être bénéfique
+
 lc_Datas* lc_get(ListeChainee *pListe,int position) 
 {
 	int cptInternal=0;
-	if(pListe->pHead!=NULL)
+  if(position<=pListe->NbElem/2)
 	{
-		lc_Datas *lc_parcours=pListe->pHead;
-		while(lc_parcours!=NULL)
-		{
-			if(cptInternal==position) return lc_parcours;
-			lc_parcours=lc_parcours->pNext;
-			cptInternal++;
+		if(pListe->pHead!=NULL)
+		{	
+			lc_Datas *lc_parcours=pListe->pHead;
+			while(lc_parcours!=NULL)
+			{
+				if(cptInternal==position) return lc_parcours;
+				lc_parcours=lc_parcours->pNext;
+				cptInternal++;
+			}
 		}
+	}
+	else
+	{
+		return lc_lastget(pListe,position);
 	}
 	return (lc_Datas*)NULL;
 }
 
 //*****************************************************************************
-// lc_lastget
+// lc_lastget (lc_get mais à partir de la fin pTail au lieu du début pHead)
 //
 // ENTREE(S):
 //
 // 	pListe: 		pointeur sur un élément de type ListeChainee
-// 	position: 	indice de l'élément que l'on veut "extraire"
+// 	position: 	indice de l'élément que l'on veut "extraire" (base index 0)
 //
 // SORTIE:
 //	
@@ -54,7 +103,7 @@ lc_Datas* lc_get(ListeChainee *pListe,int position)
 
 lc_Datas* lc_lastget(ListeChainee *pListe,int position) 
 {
-	int cptInternal=pListe->NbElem;
+	int cptInternal=pListe->NbElem-1; // juillet 2020
 	if(pListe->pTail!=NULL)
 	{
 		lc_Datas *lc_parcours=pListe->pTail;
@@ -83,17 +132,50 @@ lc_Datas* lc_lastget(ListeChainee *pListe,int position)
 //
 //*****************************************************************************
 
+// Ici en matière de performances la recherche séquentielle n'est pas
+// du tout efficace :{
+
+// EXEMPLE
+
+/* Searching for 81871           
+┃       [FOUND] 1800604738       
+┃       [PERF 0] 0,001047 second
+*/
+
+// Je n'ai rien en place pour améliorer celle-ci, une map 
+// pourrait être mise en place (position,itemid)
+// mais un tel tableau doit être gardé en mémoire :{
+
+// Comme je connais la base des identifiants je peux définir
+// par rapport au nombre d'éléments dans le tableau 
+// à quel "endroit" de celui-ci j'ai plus de chances de
+// chopper l'élément correspondant...
 
 lc_Datas* lc_search(ListeChainee *pListe,int itemid) 
 {
-	if(pListe->pHead!=NULL)
+	if(itemid-1000<=pListe->NbElem/2)
 	{
-		lc_Datas *lc_parcours=pListe->pHead;
-		while(lc_parcours!=NULL)
+		if(pListe->pHead!=NULL)
 		{
-			if(lc_parcours->item_Number==itemid) return lc_parcours;
-			lc_parcours=lc_parcours->pNext;
+			lc_Datas *lc_parcours=pListe->pHead;
+			while(lc_parcours!=NULL)
+			{
+				if(lc_parcours->item_Number==itemid) return lc_parcours;
+				lc_parcours=lc_parcours->pNext;
+			}
 		}
+	}
+	else
+	{
+		if(pListe->pTail!=NULL)
+		{		
+			lc_Datas *lc_parcours=pListe->pTail;
+			while(lc_parcours!=NULL)
+			{
+				if(lc_parcours->item_Number==itemid) return lc_parcours;
+				lc_parcours=lc_parcours->pPrevious;
+			}
+		}	
 	}
 	return (lc_Datas*)NULL;
 }
@@ -123,7 +205,7 @@ int lc_insert(void *pData,ListeChainee *pListe,short type,short taille)
 	
 		// Avril 2018 
 	
-	lc_new->Free=NULL;
+	lc_new->pFree=NULL;
 	lc_new->pDisplay=NULL;
   
   // l'insert se fera toujours en tête...
@@ -167,7 +249,7 @@ int lc_insert(void *pData,ListeChainee *pListe,short type,short taille)
 		pListe->pHead=lc_new;
 		pListe->pTail=lc_new;
   }
-  return lc_new->item_Number;
+	return lc_new->item_Number;
 }
 
 //*****************************************************************************
@@ -193,7 +275,7 @@ int lc_add(void *pData,ListeChainee *pListe,short type,short taille)
 	
 	// Avril 2018 
 	
-	lc_new->Free=NULL;
+	lc_new->pFree=NULL;
 	lc_new->pDisplay=NULL;
 	
 	// l'ajout se fera toujours en queue...
@@ -241,7 +323,7 @@ int lc_add(void *pData,ListeChainee *pListe,short type,short taille)
 		pListe->pHead=lc_new;
 		pListe->pTail=lc_new;
   }
-  return lc_new->item_Number; 
+	return lc_new->item_Number; 
 }
 
 //*****************************************************************************
@@ -288,9 +370,9 @@ int lc_delete(ListeChainee *pListe,int targetID)
 					lc_parcours->pNext->pPrevious=lc_parcours->pPrevious;
 					pListe->NbElem--;
 					elementprecedent=lc_parcours->pPrevious->item_Number;
-					if(lc_parcours->Free!=NULL)			// 2018
+					if(lc_parcours->pFree!=NULL)			// 2018
 					{
-						lc_parcours->Free(lc_parcours);
+						lc_parcours->pFree(lc_parcours);
 					}
 					free(lc_parcours);
 					return elementprecedent;
@@ -303,9 +385,9 @@ int lc_delete(ListeChainee *pListe,int targetID)
 					lc_parcours->pNext->pPrevious=NULL;
 					pListe->pHead=lc_parcours->pNext;
 					pListe->NbElem--;
-					if(lc_parcours->Free!=NULL) // 2018
+					if(lc_parcours->pFree!=NULL) // 2018
 					{
-						lc_parcours->Free(lc_parcours);
+						lc_parcours->pFree(lc_parcours);
 					}
 					free(lc_parcours);
 					return 1;
@@ -318,9 +400,9 @@ int lc_delete(ListeChainee *pListe,int targetID)
 					lc_parcours->pPrevious->pNext=NULL;
 					pListe->pTail=lc_parcours->pPrevious;	
 					pListe->NbElem--;
-					if(lc_parcours->Free!=NULL) // 2018
+					if(lc_parcours->pFree!=NULL) // 2018
 					{
-						lc_parcours->Free(lc_parcours);
+						lc_parcours->pFree(lc_parcours);
 					}
 					free(lc_parcours);
 					return 2;
@@ -328,9 +410,9 @@ int lc_delete(ListeChainee *pListe,int targetID)
 				// Cas du pNext ET pPrevious tous deux à NULL (il ne reste plus qu'un seul élément, on l'enlève)...
 				pListe->pTail=pListe->pHead=NULL;
 				pListe->NbElem=0;
-				if(lc_parcours->Free!=NULL) // 2018
+				if(lc_parcours->pFree!=NULL) // 2018
 				{
-					lc_parcours->Free(lc_parcours);
+					lc_parcours->pFree(lc_parcours);
 				}
 				free(lc_parcours);
 				return 3;
@@ -375,7 +457,7 @@ int lc_setFreeItem(ListeChainee *pTarget,int position,void (*ptrFct)(void*))
 		if(lc_Element!=NULL)
 		{
 			fprintf(stderr,"[%s] set Free %05d (%08lx)\n",__func__,lc_Element->item_Number,ptrFct);
-			lc_Element->Free=ptrFct;
+			lc_Element->pFree=ptrFct;
 			return 0;
 		}
 		else return -1;
@@ -409,13 +491,13 @@ int lc_setDisplayByID(ListeChainee *pListe, int itemID,void (*ptrFct)(void*))
 	else return -1;
 }
 
-int lc_setFreeItemByID(ListeChainee *pTarget,int itemID,void (*ptrFct)(void*))
+int lc_setpFreeItemByID(ListeChainee *pTarget,int itemID,void (*ptrFct)(void*))
 {
 		lc_Datas *lc_Element;
 		lc_Element=lc_search(pTarget,itemID);
 		if(lc_Element!=NULL)
 		{
-			lc_Element->Free=ptrFct;
+			lc_Element->pFree=ptrFct;
 			return 0;
 		}
 		else return -1;

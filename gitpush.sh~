@@ -11,8 +11,8 @@ cd saintmartin
 /usr/bin/cp -Rfv $LOCALFLDR .
 purgeall -d uep_wide -e -o -s
 purgeall -d linkedlist -e -o -s
-purgeall -d uep_debug -e -o -s
-purgeall -d ueparduino -e -o -s
+purgeall -d cssm_debug -e -o -s
+purgeall -d cssmarduino -e -o -s
 purgeall -d SDL2 -e -o -s
 purgeall -d gfxContainer -e -o -s
 git add .
