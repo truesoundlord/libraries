@@ -270,8 +270,8 @@ int lc_insert(void *pData,ListeChainee *pListe,short type,short taille)
 int lc_add(void *pData,ListeChainee *pListe,short type,short taille)
 {
   lc_Datas *lc_new=(lc_Datas*)malloc(sizeof(lc_Datas));
-	lc_Datas *seekFirst; // =(lc_Datas*)malloc(sizeof(lc_Datas)); dec2017
-  if(lc_new==NULL) return -1;
+	lc_Datas *seekFirst=NULL; // dec2017 puis juillet 2020
+  if(lc_new==NULL || pListe==NULL) return -1; // juillet 2020
 	
 	// Avril 2018 
 	
@@ -732,13 +732,14 @@ int lc_setByID(void *targetElem,ListeChainee *pListe, int targetID)
 //*****************************************************************************
 LinkedList* lc_init(void)
 {
-	LinkedList *pListe=malloc(sizeof(LinkedList));
-	if(pListe!=NULL)
+	return calloc(1,sizeof(LinkedList)); // malloc
+	/*if(pListe!=NULL)
 	{
 		pListe->NbElem=0;
-		pListe->pHead=pListe->pTail=NULL;
+		pListe->pHead=NULL;
+		pListe->pTail=NULL;
 	}
-	return pListe;
+	return pListe;*/
 }
 //*****************************************************************************
 // wraparray

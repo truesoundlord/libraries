@@ -226,5 +226,6 @@ int setElementEx(void*,int,int,int,int,int,int,void*);
 // juillet 2020
 
 void ResetBox(struct FakeWindowPos*);
+unsigned int getPIDByName(char*);
 
 #endif

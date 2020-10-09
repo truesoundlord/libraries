@@ -26,7 +26,7 @@
  */
 
 //*****************************************************************************
-// INPUT: le nom du programme dont nous cherchons le pid (process ID
+// INPUT: le nom du programme dont nous cherchons le pid (process ID)
 //
 // OUTPUT: -1 le programme n'a pas été trouvé dans la table des programmes (/proc) 
 //				 result (entier strictement positif différent de 0) le pid du programme

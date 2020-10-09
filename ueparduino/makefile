@@ -1,19 +1,19 @@
 ﻿LDFLAGS=-g
 
-libcssmarduino.o: 	libcssmarduino.c libcssmarduino.h 
+libueparduino.o: 	libueparduino.c libueparduino.h 
 
-sharedlibrary: 	libcssmarduino.c libcssmarduino.h 
+sharedlibrary: 	libueparduino.c libueparduino.h 
 		@echo "Librairie partagée compilée..."
 		@echo "...installation au niveau du système d'exploitation !!"
-		gcc -c -fPIC -O3 libcssmarduino.c -o libcssmarduino.o
+		gcc -c -fPIC -O3 libueparduino.c -o libueparduino.o
 		@echo "...compilation de la librairie..."
-		gcc -shared -Wl,-soname,libcssmarduino.so libcssmarduino.o -lpthread -lm -o libcssmarduino.so.0.0.1
-		@cp -v libcssmarduino.so.0.0.1 /usr/lib64
-		@chmod 0755 /usr/lib64/libcssmarduino.so.0.0.1
+		gcc -shared -Wl,-soname,libueparduino.so libueparduino.o -lpthread -lm -o libueparduino.so.0.0.1
+		@cp -v libueparduino.so.0.0.1 /usr/lib64
+		@chmod 0755 /usr/lib64/libueparduino.so.0.0.1
 		@cd /usr/lib64
 		@echo "...linking..."
 		@ldconfig
-		@ldconfig -p | grep cssm
+		@ldconfig -p | grep uep
 		@echo "TERMINE"
 
 nettoyage:

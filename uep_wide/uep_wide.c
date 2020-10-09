@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #endif
 
-#include "cssm_wide.h"
+#include "uep_wide.h"
 
 // C'est là que l'orienté objet aurait été efficace... 
 
@@ -65,21 +65,19 @@ static bool	fctcore_brunning=true;																																														
 //*****************************************************************************
 void AfficherXY(char *pMsg,int posX,int posY)
 {
-	int 		taillereelle;
+	int 		taillereelle=0;
 	
-	#ifdef __DEBUG__
+#ifdef __DEBUG__
 	wchar_t	strDebug[taillereelle+1];
 	fflush(stderr);
 	if(Debug==NULL)
 	{
 		Debug=freopen("./logs/AfficherXY.log","a+",stderr);
 	}
-	#endif	
+
+	// 20 novembre 2017
 	
-#ifdef __DEBUG__
-// 20 novembre 2017
-	
-fwprintf(stderr,L"[DEBUG] %08x (%d)\n",pMsg,taillereelle+1);	
+	fwprintf(stderr,L"[DEBUG] %08x (%d)\n",pMsg,taillereelle+1);	
 #endif
 	
 	if(pMsg==NULL || strlen(pMsg)==0) return;
@@ -90,12 +88,12 @@ fwprintf(stderr,L"[DEBUG] %08x (%d)\n",pMsg,taillereelle+1);
 	//wchar_t *tmpMsg=(wchar_t*)malloc(sizeof(wchar_t)*(taillereelle+1));
 		
 	wmemset(tmpMsg,0,taillereelle+1);
-	mbstowcs(tmpMsg,pMsg,taillereelle+1);
+	mbstowcs(tmpMsg,pMsg,taillereelle+2);  // juillet 2020
 	tmpMsg[taillereelle+1]=L'\0';																									// mars 2015
 	
-	#ifdef __DEBUG__
+#ifdef __DEBUG__
 	fwprintf(stderr,L"[DEBUG][%-*ls]\n",taillereelle+1,tmpMsg);
-	#endif
+#endif
 	
 	wprintf(L"\x1b[s");							/* Sauve la position courante du curseur */
 	wprintf(L"\x1b[%d;%dH%ls",posY,posX,tmpMsg);
@@ -511,7 +509,7 @@ void EffacerEcran()
 int getch() 
 {
   struct termios oldt, newt;
-	struct sigaction Detournement;
+	struct sigaction Detournement={ { 0 } };
 		
 	Detournement.sa_handler=SIG_IGN;
 	// On ne peut pas interrompre le getch...
@@ -1189,13 +1187,29 @@ FILE *InitLog(char *pFolder,char *pFilename,e_logmode mode)
 	
 	umask(0);
 	mkdir(pFolder,S_IRWXO);
-	chdir(pFolder);
+	chdir(pFolder); 							// Fout la merde !!!!! août 2020
 	
 	if(mode==LOGA)
 		pFichier=fopen(pFilename,"a+");
 	else
 		pFichier=fopen(pFilename,"w");
-		
+	
+	// Calculer le nombre de niveaux pour remonter !!!! août 2020
+	
+	char *pChercher=NULL;
+	int niveaux=0;
+	while((pChercher=strchr(pFolder,'/'))!=NULL)
+	{
+		niveaux++;												
+		pFolder++;  										// "pointer" le caractère situé après le '/'
+		if(*pFolder=='\0') break;				// si on arrive à la fin de la chaîne, hop !! on sort ^^
+	}
+	
+	while(--niveaux>0)
+	{
+		chdir(".."); // revenir au répertoire du dessus...
+	}
+	
 	return pFichier;
 }
 
@@ -1346,7 +1360,7 @@ int nbgetch(void)
 	char							Buffer;
 	struct termios		oldtcfg;
 	struct termios		newtcfg;
-	struct sigaction	Detournement;
+	struct sigaction	Detournement={ { 0 } };
 	
 	Detournement.sa_handler=SIG_IGN;
 	// On ne peut pas interrompre le getch...
@@ -1394,7 +1408,7 @@ int nbgetchEx(void)
 	char							Buffer;
 	struct termios		oldtcfg;
 	struct termios		newtcfg;
-	struct sigaction	Detournement;
+	struct sigaction	Detournement={ { 0 } };
 	
 	Detournement.sa_handler=SIG_IGN;
 	// On ne peut pas interrompre le getch...
@@ -1458,7 +1472,7 @@ char* getTimedUTF8String(short maxlen,short maxtime)
 {
 	// décembre 2017
 	
-	struct sigaction Detournement;
+	struct sigaction Detournement={ { 0 } };
 		
 	Detournement.sa_handler=SIG_IGN;
 	// On ne peut pas interrompre la fonction...
