@@ -1,7 +1,9 @@
 #ifndef __LINKEDLIST__
 #define __LINKEDLIST__
 
-enum{cssmuserdef=-1,cssmbyte=1,cssmint=4,cssmfloat,cssmlong=8,cssmdouble,cssmldouble};
+#include <stdbool.h>
+
+enum{cssmuserdef=-1,cssmbyte=1,cssmshort,cssmint=4,cssmfloat,cssmlfoat,cssmlong,cssmllong=8,cssmdouble,cssmldouble};
 
 static unsigned int gen_Number=1000;                            // pour pouvoir différencier un élément de la liste par rapport à un autre
 
@@ -75,6 +77,8 @@ lc_Datas* lc_lastget(ListeChainee*,int);                        // récupère (s
 
 LinkedList*		lc_init(void);																			// initialise une liste chaînée
 t_cssmarray*	wraparray(void*,int,int,int);												// encapsule un tableau de x dimensions de n'importe quel type
+
+int lc_FindByValue(LinkedList*,void*,bool (*)(void*,void*));			// compare deux éléments par leur valeur dans une fonction fournie en dernier paramètre
 
 #endif
 

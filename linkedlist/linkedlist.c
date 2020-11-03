@@ -761,3 +761,60 @@ t_cssmarray* wraparray(void *pArray,int nbcols,int nblins,int depth)
 	
 	return tmp;
 }
+
+//*************************************
+// lc_FindByValue (2020)
+//
+// Fonction de recherche dans une liste chaînée par valeur
+//
+// input:		depot -- la liste chaînée contenant les références
+//					value -- le "pattern" à chercher
+//					fctcmp -- une fonction de comparaison (dans le cadre d'une structure de données on ne peut pas comparer aussi facilement qu'avec les types prédéfinis)
+// output:	l'identifiant de l'objet dans la liste chaînée
+//					ou -1 si pas trouvé (-2 si fonction de comparaison non fournie)
+//
+//
+
+int lc_FindByValue(LinkedList *depot,void *value,bool (*fctcmp)(void*,void*))
+{
+	if(depot==NULL) return -1;
+	if(value==NULL) return -1;
+	
+	lc_Datas *pSeek=depot->pHead;								// arbitrairement on commence par la tête de la liste
+	// cela risque d'être lent à crever :{
+	
+	while(pSeek!=NULL)
+	{
+		// il faut pouvoir déterminer si il s'agit d'une variable numérique ou alphanumérique :{
+			
+		switch(pSeek->dataType)
+		{
+			case cssmbyte:		if(*((char*)pSeek->value)==*((char*)value)) return pSeek->item_Number;
+												break;
+			case cssmint:			if(*((int*)pSeek->value)==*((int*)value)) return pSeek->item_Number;
+												break;
+			case cssmfloat:		if(*((float*)pSeek->value)>=*((float*)value)+0.000001) return pSeek->item_Number;						// simple précision
+												break;
+			case cssmdouble:	if(*((double*)pSeek->value)>=*((double*)value)+1E-16) return pSeek->item_Number;						// doouble précision
+												break;
+			case cssmldouble:	if(*((long double*)pSeek->value)>=*((long double*)value)+1E-16) return pSeek->item_Number;
+												break;
+			case cssmlong:		if(*((long*)pSeek->value)==*((long*)value)) return pSeek->item_Number;
+												break;
+			case cssmllong:		if(*((long long*)pSeek->value)==*((long long*)value)) return pSeek->item_Number;
+												break;
+		}
+		
+		if(pSeek->dataType==cssmuserdef) // structure ou alphanumerique
+		{
+			if(fctcmp==NULL) return -2;
+			bool result=fctcmp(pSeek->value,value);
+			if(result) return pSeek->item_Number;
+		}
+
+		pSeek=pSeek->pNext;
+	}
+	
+	return -1;
+	
+}
