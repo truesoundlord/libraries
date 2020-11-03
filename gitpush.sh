@@ -9,6 +9,7 @@ echo "Nous sommes dans le répertoire $(pwd)"
 git clone $SITE saintmartin
 cd saintmartin
 /usr/bin/cp -Rfv $LOCALFLDR .
+cp -f /utilitaires/shell/executemefirst.sh $GITFLDR
 purgeall -d uep_wide -e -o -s
 purgeall -d linkedlist -e -o -s
 purgeall -d uep_debug -e -o -s
