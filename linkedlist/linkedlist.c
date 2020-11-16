@@ -1,9 +1,9 @@
+#ifndef __LINKEDLIST__
+#include "linkedlist.h"
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#ifndef __LINKEDLIST__
-#include "linkedlist.h"
 #endif
 
 //*****************************************************************************
@@ -744,7 +744,7 @@ LinkedList* lc_init(void)
 //*****************************************************************************
 // wraparray
 //
-// Permet d'initialiser une liste chaînée
+// Permet d'initialiser un tableau de x dimensions
 //
 // ENTREES:
 //	pArray: pointeur sur le premier élément d'un tableau de une, deux ou trois dimensions
@@ -770,6 +770,20 @@ t_cssmarray* wraparray(void *pArray,int nbcols,int nblins,int depth)
 // input:		depot -- la liste chaînée contenant les références
 //					value -- le "pattern" à chercher
 //					fctcmp -- une fonction de comparaison (dans le cadre d'une structure de données on ne peut pas comparer aussi facilement qu'avec les types prédéfinis)
+//
+//	Exemple:  dans le cadre de comparaison entre la source et destination d'un message ARP
+//	bool compare(void *model,void *pattern)
+//	{
+//		t_MyARPInfos *tmpM=(t_MyARPInfos*)model;
+//		t_MyARPInfos *tmpP=(t_MyARPInfos*)pattern;
+//	
+//		if(strcmp(tmpM->dMACAddr,tmpP->sMACAddr)!=0) return false;
+//		return true;
+// 	}
+//
+// Utilisation dans le code:
+//	int resultat=lc_FindByValue(pARP,arpinfos,compare);
+//
 // output:	l'identifiant de l'objet dans la liste chaînée
 //					ou -1 si pas trouvé (-2 si fonction de comparaison non fournie)
 //
@@ -780,29 +794,53 @@ int lc_FindByValue(LinkedList *depot,void *value,bool (*fctcmp)(void*,void*))
 	if(depot==NULL) return -1;
 	if(value==NULL) return -1;
 	
-	lc_Datas *pSeek=depot->pHead;								// arbitrairement on commence par la tête de la liste
-	// cela risque d'être lent à crever :{
+	lc_Datas *pSeek=depot->pHead;		// arbitrairement on commence par la tête de la liste
+																	// cela risque d'être lent à crever :{
 	
 	while(pSeek!=NULL)
 	{
-		// il faut pouvoir déterminer si il s'agit d'une variable numérique ou alphanumérique :{
-			
+		if(pSeek->dataType==cssmfloat) 
+		{
+			float epsilon;
+			float delta;
+				
+			epsilon=1E-38;
+			delta=fabsf(*((float*)pSeek->value)-*((float*)value));
+			if(epsilon < delta) return pSeek->item_Number;
+		}
+		
+		if(pSeek->dataType==cssmdouble) 
+		{
+			double epsilon;
+			double delta;
+				
+			epsilon=1E-308;
+			delta=fabs(*((double*)pSeek->value)-*((double*)value));
+			if(epsilon < delta) return pSeek->item_Number;
+		}
+		
+		if(pSeek->dataType==cssmldouble) 
+		{
+			long double epsilon;
+			long double delta;
+				
+			epsilon=1E-308;
+			delta=fabsl(*((long double*)pSeek->value)-*((long double*)value));
+			if(epsilon < delta) return pSeek->item_Number;
+		}
+				
 		switch(pSeek->dataType)
 		{
-			case cssmbyte:		if(*((char*)pSeek->value)==*((char*)value)) return pSeek->item_Number;
-												break;
-			case cssmint:			if(*((int*)pSeek->value)==*((int*)value)) return pSeek->item_Number;
-												break;
-			case cssmfloat:		if(*((float*)pSeek->value)>=*((float*)value)+0.000001) return pSeek->item_Number;						// simple précision
-												break;
-			case cssmdouble:	if(*((double*)pSeek->value)>=*((double*)value)+1E-16) return pSeek->item_Number;						// doouble précision
-												break;
-			case cssmldouble:	if(*((long double*)pSeek->value)>=*((long double*)value)+1E-16) return pSeek->item_Number;
-												break;
-			case cssmlong:		if(*((long*)pSeek->value)==*((long*)value)) return pSeek->item_Number;
-												break;
-			case cssmllong:		if(*((long long*)pSeek->value)==*((long long*)value)) return pSeek->item_Number;
-												break;
+			case cssmbyte:	if(*((char*)pSeek->value)==*((char*)value)) return pSeek->item_Number;
+											break;
+		  case cssmshort:	if(*((short*)pSeek->value)==*((short*)value)) return pSeek->item_Number;
+											break;
+			case cssmint:		if(*((int*)pSeek->value)==*((int*)value)) return pSeek->item_Number;
+											break;
+			case cssmlong:	if(*((long*)pSeek->value)==*((long*)value)) return pSeek->item_Number;
+											break;
+			case cssmllong:	if(*((long long*)pSeek->value)==*((long long*)value)) return pSeek->item_Number;
+											break;
 		}
 		
 		if(pSeek->dataType==cssmuserdef) // structure ou alphanumerique
@@ -811,10 +849,7 @@ int lc_FindByValue(LinkedList *depot,void *value,bool (*fctcmp)(void*,void*))
 			bool result=fctcmp(pSeek->value,value);
 			if(result) return pSeek->item_Number;
 		}
-
 		pSeek=pSeek->pNext;
 	}
-	
 	return -1;
-	
 }
