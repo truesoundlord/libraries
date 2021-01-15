@@ -1,1 +1,0 @@
-/utilitaires/shell/école/purge.sh
