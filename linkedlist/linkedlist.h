@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-enum{cssmuserdef=-1,cssmbyte=1,cssmshort,cssmint=4,cssmfloat,cssmlfoat,cssmlong,cssmllong=8,cssmdouble,cssmldouble};
+enum{cssmuserdef=-1,cssmbyte=1,cssmshort,cssmint=4,cssmfloat,cssmlong,cssmllong=8,cssmdouble,cssmldouble};
 
 static unsigned int gen_Number=1000;                            // pour pouvoir différencier un élément de la liste par rapport à un autre
 

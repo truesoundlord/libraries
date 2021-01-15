@@ -16,7 +16,7 @@
 #define LOGPATH	"./logs"
 #endif
 
-#define ERR_IOERROR		-1
+#define ERR_IOERROR			-1
 #define ERR_PATHTOOLONG -2
 
 // Définitions des fonctions

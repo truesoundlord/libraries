@@ -5,7 +5,7 @@ gfxContainer:
 		gcc -c -g -fPIC -O3 gfxFunctions.c `pkg-config linkedlist --cflags` `pkg-config linkedlist --libs` -o gfxfcts.o
 		gcc -c -g -fPIC -O3 gfxErrorHandling.c `pkg-config linkedlist --cflags` `pkg-config linkedlist --libs` -o gfxerror.o		
 		@echo "Compilation de la librairie partagée..."
-		gcc -shared -Wl,-soname,libGFXContainer.so libGFXContainer.o gfxfcts.o gfxerror.o -lSDL2 -lSDL2_ttf -lpthread -lm -o libGFXContainer.so.1.0.1
+		gcc -shared -Wl,-soname,libGFXContainer.so libGFXContainer.o gfxfcts.o gfxerror.o -lSDL2 -lSDL2_ttf -lSDL2_image -lpthread -lm -o libGFXContainer.so.1.0.1
 		@echo "Invocation des outils systèmes..."
 		@cp -v libGFXContainer.so.1.0.1 /usr/lib64
 		@chmod 0755 /usr/lib64/libGFXContainer.so.1.0.1

@@ -169,7 +169,7 @@ void setBackgroundColor(struct s_RGB);																											// Permet de sp
 
 void PaintBox(struct FakeWindowPos,struct s_RGB);                                           // Permet de "peindre" le background d'un cadre...	
 
-//void  Interruptions(int);																																	// Fonction utilisée dans getch() --> doit être ajoutée dans tous les programmes utilisant cssm_wide.h 
+//void  Interruptions(int);																																	// Fonction utilisée dans getch() --> doit être ajoutée dans tous les programmes utilisant uep_wide.h 
 
 void  Push(void*,Stack*,short);																															// Permet de "pusher" (mettre sur la pile) une variable de n'importe quel type (haute voltige)
 void* Pop(Stack*,short);																																		// Permet de "popper" (enlever de la pile) une variable de n'importe quel type (haute voltige)

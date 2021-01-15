@@ -53,13 +53,13 @@ short getDescriptors(int *paramstdout, int *paramstderr, char *paramFile)
   //oldstderr_id=dup(fileno(stderr));
 	
 	umask(0);
-  mkdir(LOGPATH, S_IRWXO);									// avec seulement S_IRWXU cela déclenche une exception si l'utilisateur n'est pas root...
+  mkdir(LOGPATH, S_IRWXO|S_IXGRP|S_IXUSR);									// avec seulement S_IRWXU cela déclenche une exception si l'utilisateur n'est pas root...
 	
-	//printf("[DEBUG] %04d\n",errno);
+	// printf("[DEBUG] %04d\n",errno);
 	
-	if(errno!=EEXIST && errno!=ENOENT && errno!=ESPIPE) 				// il faut ignorer le "no such file or directory" (errno 2)
+	if(errno!=EEXIST && errno!=ENOENT && errno!=ESPIPE && errno!=11) 				// il faut ignorer le "no such file or directory" (errno 2) et errno 11 (resource temporarily unavailable)
 	{
-		perror("[cssmdebugtool] mkdir() failed to create folder !!");
+		perror("[cssmdebugtool] mkdir() failed to create folder ");
 		return ERR_IOERROR;
 	}
 	
