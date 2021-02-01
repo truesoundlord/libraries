@@ -828,7 +828,7 @@ char *getnchar(int maximum)
 	int		nbreCar=0;									// permet de s'assurer que le nombre de caractères est bien atteint
 	int 	adaptedsize=maximum;				// la taille peut changer à cause des caractères UTF8
 	wchar_t convertedCar;							// permet d'afficher les caractères UTF8 convenablement 
-	char    toconvert[2];	// warning leap15 juillet 2018								
+	char    toconvert[2];							// warning leap15 juillet 2018								
 	char *pReturnPointer;							// pointeur à retourner à la fonction appelante
 	char *pTmp;												// pointeur temporaire
 		
@@ -880,7 +880,7 @@ char *getnchar(int maximum)
 			if(maximum>1) // ce bloc sera exécuté deux fois (un caractère utf8 est codé sur 2 bytes)...
 			{
 				if(*pTmp!=-61 && *pTmp!=-62) nbreCar++;																	// on ne compte le caractère que si nous avons traité les deux caractères UTF8
-				//strncpy(&toconvert,pTmp,2);																							// deux bytes à convertir en unicode
+				//strncpy(&toconvert,pTmp,2);																						// deux bytes à convertir en unicode
 				strncpy(toconvert,pTmp,2);
 				//int rc=mbtowc(&convertedCar,&toconvert,1);
 				int rc=mbtowc(&convertedCar,toconvert,1);
@@ -1379,7 +1379,11 @@ int nbgetch(void)
 		
 	newtcfg.c_cc[VMIN] = 0;
 	newtcfg.c_cc[VTIME] = 2;																											// 0 ça pousse le processeur à 100% (faire gaffe à ce que l'on fait)
-	newtcfg.c_lflag &= ~(ICANON|ECHOCTL);																				// n'a pas besoin d'appuyer sur "entrée" (caractère non bloquant de la procédure)
+	
+	// BUG 2021
+	// Il ne faut pas faire l'écho du '\n'...
+	
+	newtcfg.c_lflag &= ~(ICANON|ECHOCTL|ECHO);																		// n'a pas besoin d'appuyer sur "entrée" (caractère non bloquant de la procédure)
 	tcsetattr(STDIN_FILENO, TCSANOW, &newtcfg);
 	
 	Buffer=getchar();	// retourne EOF (-1) si il y a rien dans le buffer
@@ -1456,7 +1460,6 @@ int nbgetchEx(void)
 // Sortie: la chaîne de caractères 
 //*****************************************************************************
 
-
 //*****************************************************************************
 // Fonction en tests ^^
 //*****************************************************************************
@@ -1467,98 +1470,134 @@ int nbgetchEx(void)
 // 2017: décembre
 //				remplacement des printf par wprintf
 //				mise en place de l'empêchement d'appuyer sur CTRL-C
+// 2021: il fallait compléter cette fonction pour qu'elle ressemble à getnchar()
 
-char* getTimedUTF8String(short maxlen,short maxtime)
+// Refonte février 2021
+// Copier getnchar() et juste remplacer getch() par nbgetch()
+// Ainsi que la gestion du "timer"
+
+char* getTimedUTF8String(short maximum,short maxtime)
 {
-	// décembre 2017
-	
-	struct sigaction Detournement={ { 0 } };
+	int 	offset=0;										// déplacement
+	int		nbreCar=0;									// permet de s'assurer que le nombre de caractères est bien atteint
+	int 	adaptedsize=maximum;				// la taille peut changer à cause des caractères UTF8
+	wchar_t convertedCar;							// permet d'afficher les caractères UTF8 convenablement 
+	char    toconvert[2];							// warning leap15 juillet 2018								
+	char *pReturnPointer;							// pointeur à retourner à la fonction appelante
+	char *pTmp;												// pointeur temporaire
 		
-	Detournement.sa_handler=SIG_IGN;
-	// On ne peut pas interrompre la fonction...
-	sigaction(SIGINT,&Detournement,NULL);
+	if(maximum>0)
+	{
+		pReturnPointer=(char*)calloc(maximum+1,sizeof(char));		
+		pTmp=(char*)calloc(maximum+1,sizeof(char));				
+		//memset((void*)pTmp,0,maximum);
+		//memset((void*)pReturnPointer,0,maximum);    // corrections 28 mai 2018
+	}
+	else
+		return NULL;
 	
-	int		cpt=0;
-	char	cCaractere=-1;
 	time_t start=time(NULL);
 	time_t current;
-	
-	maxlen++;	// pour ajouter le '\0'
-	
-	// tmp est un pointeur: il contient (il pointe sur) une adresse en mémoire à partir de laquelle sont réservés "maxlen" caractères...
-	
-	unsigned char*	tmp=malloc(maxlen);
-	memset(tmp,0,maxlen);
-	
-	// 1. Effectuer la boucle 
-	
-	while(cCaractere!=10 && cpt<maxlen-1)
-	{
-		cCaractere=nbgetch();							// nous saisissons au clavier un caractère de manière non bloquante... si il n'y a rien dans le buffer cCaractere vaut -1.
-		current=time(NULL);
 		
-		if(cCaractere!=-1) 
-		{
-			if(cCaractere!=10)
-				*tmp=cCaractere;							// A l'adresse pointée par tmp, nous mettons cCaractere cela revient au même que de faire tmp[cpt]=cCaractere...
-					
-			if(cCaractere==127) 
-			{
-				// traitement du backspace
-				wprintf(L"\x1b[1D");						// ??? ne fonctionne pas... tous les autres codes ANSI fonctionnent mais pas celui-ci là !!
-																			// ...essayé plein de fois dans d'autres codes source mais ici ça ne marche pas ???
-																			// Il suffit de spécifier ~ECHOCTL pour que cela fonctionne (au niveau de nbgetch())
-				wprintf(L" ");
-				wprintf(L"\x1b[1D");
-				fflush(stdout);
-				
-				// prévoir l'effacement de caractères UTF8 (deux bytes voire plus :{ )
-								
-				if(*(tmp-2)==195 || *(tmp-2)==194) // je me base uniquement sur le code latin1-be
-				{
-					tmp--;
-					cpt--;
-				}
-								
-				if(cpt>0) cpt--;
-				tmp--;
-				
-				continue;
-			}
-			// Traitement des touches de direction
-			if(cCaractere==27) 
-			{
-				// déterminer la direction 
-				cCaractere=nbgetch();
-				if(cCaractere==91)
-				{
-					cCaractere=nbgetch();
-					if(cCaractere=='A') wprintf(L"\x1b[B");
-					if(cCaractere=='B') wprintf(L"\x1b[A");
-					if(cCaractere=='C') wprintf(L"\x1b[D");
-					if(cCaractere=='D') wprintf(L"\x1b[C");
-				}
-				else
-				{
-					// Vider le buffer
-					while((cCaractere=nbgetch())!=-1);
-				}
-				continue;
-			}
-			cpt++;
-			tmp++;	// passer à la case suivante (un byte) en mémoire... 
-		}
+	while(nbreCar<maximum)
+	{
+		*pTmp=nbgetch();								// c'est complexe je sais...
+		current=time(NULL);
 		if(current-start==maxtime) break;
-	}
-	
-	// Restitution des signaux standards
-	
-	Detournement.sa_handler=SIG_DFL;
-	Detournement.sa_flags=0;
-	sigaction(SIGINT,&Detournement,NULL);
-	
-	return (char*)(tmp-cpt);	// comme nous avons changé la valeur de l'adresse en mémoire pour y mettre tous nos caractères, il faut restituer l'adresse de DEBUT du tableau...
+		if(*pTmp==-1) continue;					// on ne fait le traitement que si pTmp contient autre chose que -1 (aucune touche appuyée)
+				
+		if(*pTmp==10 || *pTmp==27) break;
+		
+		
+		if(*pTmp>0) // Il ne s'agit pas de caractères UTF8
+		{
+			if(*pTmp!=127) 							// Si pas backspace (effacer)
+			{
+				wprintf(L"%c",*pTmp);			// sous Windows, getch() ne fait pas l'écho du caractère non plus...
+				pTmp++;					
+				offset++;	
+				nbreCar++;								// incrémentation du compteur pour pouvoir sortir...
+			}
+			else // gestion du caractère BS (back space)
+			{
+				if(offset>0 && nbreCar>0)
+				{
+					wprintf(L"\x1b[1D"); 	// on retourne en arrière
+					wprintf(L" ");				// on efface le caractère
+					wprintf(L"\x1b[1D");	// on retourne en arrière
+					pTmp--;								// idem pour le pointeur il faut revenir une position "en arrière"
+					offset--;							// on se déplace d'une "case" à gauche en mémoire...
+					nbreCar--;						// il ne faut pas compter cette entrée comme un caractère
+				}
+				if(*pTmp<0)							// si c'est un caractère UTF8 
+				{
+					pTmp--;								// il faut effacer le code -61 
+					offset--;							// on se déplace d'une "case" à gauche en mémoire...
+				}
+			}
+		}
+		// Gestion des caractères UTF8
+		else
+		{
+			if(maximum>1) // ce bloc sera exécuté deux fois (un caractère utf8 est codé sur 2 bytes)...
+			{
+				if(*pTmp!=-61 && *pTmp!=-62) nbreCar++;																	// on ne compte le caractère que si nous avons traité les deux caractères UTF8
+				//strncpy(&toconvert,pTmp,2);																						// deux bytes à convertir en unicode
+				strncpy(toconvert,pTmp,2);
+				//int rc=mbtowc(&convertedCar,&toconvert,1);
+				int rc=mbtowc(&convertedCar,toconvert,1);
+				if(convertedCar>0 && rc>0) 																							// on affiche uniquement lorsque le caractère est valide...
+				{
+					wprintf(L"%lc",convertedCar);
+				}
+				adaptedsize++;   
+				
+				// tentative de ré-allouer la zone mémoire pour s'adapter aux caractères entrés... (correction 28 mai 2018)
+				// BUG: dans certains cas (surtout dans netbeans :{) quand nous plaçons plusieurs caractères UTF8 les uns après les autres 
+				// nous "obtenons" un double free or corruption (fasttop)
+				
+				// C library thinks you did a double free (that is, you freed the same thing twice, which is of course a bug) or that you corrupted its data structures, 
+				// such as by writing beyond the end of a buffer you allocated. 
+				
+				// valgrind indique des lectures, écritures et libérations (free/realloc/delete) dans realloc()...
+#ifdef AVANT				
+				pReturnPointer=(char*)realloc(pReturnPointer,sizeof(char)*adaptedsize);
+#else
+				//free(pReturnPointer);
+				pReturnPointer=(char*)calloc(adaptedsize,0); 	// BUG résolu, maintenant je n'ai aucune explications concernant le fait que realloc() fonctionne
+																											// "quand elle en a envie" :{
+#endif
+
+				pReturnPointer=pTmp-offset;																							// nous venons de changer la taille de la chaine il faut lui donner une valeur...
+								
+				offset++;
+				pTmp++;
+			}
+			else
+			{
+				// Encodage... d'un seul caractère de type UTF8
+
+				pReturnPointer=(char*)realloc(pReturnPointer,sizeof(char)*3);		// le code -61 (ou -62), le code du caractère et \0...
+				pReturnPointer[0]=*pTmp;						// indique qu'il s'agit d'UTF8 (pour l'affichage)
+				pReturnPointer[1]=getch();					// les caractères UTF8 ne sont pas complets jusqu'à ce que 2 bytes aient été "saisis" le getch() ici récupère la partie manquante...
+				pReturnPointer[2]='\0';							// on indique la fin de la chaine...
+				
+				// Affichage
+				
+				wchar_t todisplay;
+				int rc=mbtowc(&todisplay,pReturnPointer,2);
+				if(rc>0)
+					wprintf(L"%lc",todisplay);
+				return pReturnPointer;																					// inutile d'aller plus loin...
+			}
+		}
+		
+	} // endwhile
+	*pTmp='\0'; 
+	pReturnPointer=pTmp-offset;	// on retourne le début de phrase et non la position actuelle...
+	return pReturnPointer;
 }
+
 
 /*
  * Fonction qui active ou désactive l'écho des caractères entrés au terminal (foire avec l'utilisation de getch() et consors --> à tester :{ )
