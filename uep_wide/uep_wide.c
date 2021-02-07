@@ -803,8 +803,8 @@ chrono getTimeElapsed(char *pBegin,char *pEnd)
 		tmpTempsEcoule.Minutes--;
 		tmpTempsEcoule.Secondes=(60-atoi(DatasBegin[2]))+atoi(DatasEnd[2]); // cas de la partie commencée à 09:16:12 et terminée à 09:39:02 
 	}
-	free(SplittedBegin);
-	free(SplittedEnd);		 // ACHTUNG !!
+	//free(SplittedBegin);
+	//free(SplittedEnd);		 // ACHTUNG !!
 	return tmpTempsEcoule;
 }
 
@@ -1383,7 +1383,7 @@ int nbgetch(void)
 	// BUG 2021
 	// Il ne faut pas faire l'écho du '\n'...
 	
-	newtcfg.c_lflag &= ~(ICANON|ECHOCTL|ECHO);																		// n'a pas besoin d'appuyer sur "entrée" (caractère non bloquant de la procédure)
+	newtcfg.c_lflag &= ~(ICANON|ECHOCTL);																					// n'a pas besoin d'appuyer sur "entrée" (caractère non bloquant de la procédure)
 	tcsetattr(STDIN_FILENO, TCSANOW, &newtcfg);
 	
 	Buffer=getchar();	// retourne EOF (-1) si il y a rien dans le buffer
