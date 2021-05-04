@@ -38,6 +38,7 @@
 #define COLORED_TITLE 		1
 #define COLORED_BOTH      2
 #define COLORED_SEPARATE	3
+#define COLOR_NULL				((struct s_RGB){0})
 
 #define CSSM_AS_FST	  065000000L
 #define CSSM_AS_NRML  127000000L

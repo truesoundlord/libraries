@@ -1,5 +1,5 @@
-CFLAGS=`pkg-config cssmwide linkedlist --cflags`
-LDFLAGS=`pkg-config cssmwide linkedlist --libs`
+CFLAGS=`pkg-config uepwide linkedlist --cflags`
+LDFLAGS=`pkg-config uepwide linkedlist --libs`
 
 
 signaltest: signaltest.c

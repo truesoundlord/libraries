@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   libcssmarduino.c
  * Author: Dimitri "Hurukan" <soundlord@gmail.com>
  *
@@ -10,7 +10,7 @@
 // ****************************************************************************
 
 // 17 octobre 2019
-// Ajout des fonctions 
+// Ajout des fonctions
 // isArduinoConnected (en rapport avec le projet gtkarduino)
 // ConfigureArduino (idem)
 // RcvMessage
@@ -34,7 +34,7 @@
 #include <unistd.h>
 #include <string.h>
 
-
+#include <uep_wide.h>
 
 #include "libueparduino.h"
 
@@ -59,7 +59,7 @@ bool isArduinoDetected(char *pFichier)
 
 // B38400
 // B57600
-// B115200 <-- 
+// B115200 <--
 // B230400
 // B460800
 
@@ -67,17 +67,17 @@ int ConfigureArduino(char *pFichier,speed_t vitesse)
 {
 	int portdesc;							// descripteur de l'Arduino
 	struct termios options;		// caractéristiques d'un terminal
-	
+
 	portdesc=open(pFichier, O_RDWR | O_NOCTTY | O_SYNC);											// Ni la lecture ni l'écriture ne seront bloquantes
-	if(portdesc>0)	
+	if(portdesc>0)
 	{
 		fcntl(portdesc,F_SETFL,0);		// réinitialiser le port série
 		// Il faut que les deux équipements fonctionnent à la même "vitesse"...
 
 		tcgetattr(portdesc, &options);
-		//cfsetispeed(&options, vitesse);
+		cfsetispeed(&options, vitesse);
 		cfsetospeed(&options, vitesse);
-		
+
 		//options.c_cflag |= (CLOCAL | CREAD);    /* ignore modem controls */
     options.c_cflag &= ~CSIZE;
     options.c_cflag |= CS8;         /* 8-bit characters */
@@ -93,12 +93,13 @@ int ConfigureArduino(char *pFichier,speed_t vitesse)
     /* fetch bytes as they become available */
     options.c_cc[VMIN] = 1;
     options.c_cc[VTIME] = 1;
-		
+
 		tcsetattr(portdesc, TCSANOW, &options);
-		
+
 
 
 	}
+	sleep(2); 				// Il faut 2 secondes pour que l'ARDUINO puisse se configurer
 	return portdesc;
 }
 
@@ -112,15 +113,27 @@ void UnlinkArduino(int portdesc)
 	close(portdesc);
 }
 
-void*	RcvMessage(int descripteur,size_t szBloc)
+void*	RcvMessage(int descripteur,size_t szBloc,int *ReadBytes)
 {
 	char	*pMessage=calloc(szBloc,sizeof(char));
-	int		errcode=read(descripteur,pMessage,szBloc);
-	if(errcode>0)
+	//setDTR(descripteur,true);
+	*ReadBytes=read(descripteur,pMessage,szBloc);
+	//setDTR(descripteur,false);
+	if(*ReadBytes>0)
 	{
 		return (void*)pMessage;
 	}
 	else return NULL;
+}
+
+char readByte(int descripteur)
+{
+	char unCaractere;
+
+	//setDTR(descripteur,true);
+	read(descripteur,&unCaractere,1);
+	//setDTR(descripteur,false);
+	return unCaractere;
 }
 
 int SndMessage(int descripteur,void *pBuffer,size_t szBloc)
@@ -148,40 +161,55 @@ bool PackMessage(char *source, t_ArduinoDatas *target)
 
 t_ArduinoDatas* ProtocolGetArduinoStatus(int descripteur)
 {
-	
+
 }
 
 bool	ProtocolSetArduinoStatus(int descripteur,t_ArduinoDatas *source)
 {
-	
+
 }
 
 
-int setRTS(int portdesc, bool level)
+int setRTS(int portdesc, bool level) // RTS: Request To Send (??)
 {
 		int Terminal_flag;
 		if(level)
 		{
-			Terminal_flag |= (TIOCM_RTS); 
+			Terminal_flag |= (TIOCM_RTS);
 		}
 		else
 		 Terminal_flag &= ~(TIOCM_RTS);
-	
+
 		return ioctl(portdesc,TIOCMBIS,&Terminal_flag);
 }
 
-int setDTR(int portdesc, bool level)
+int setDTR(int portdesc, bool level) // DTR: Data Terminal Ready
 {
 		int Terminal_flag;
 		if(level)
 		{
-			Terminal_flag |= (TIOCM_DTR); 
+			Terminal_flag |= (TIOCM_DTR);
 		}
 		else
 		 Terminal_flag &= ~(TIOCM_DTR);
-	
+
 		return ioctl(portdesc,TIOCMBIS,&Terminal_flag);
 }
+
+int setCTS(int portdesc, bool level) // CTS: Clear To Send
+{
+		int Terminal_flag;
+		if(level)
+		{
+			Terminal_flag |= (TIOCM_CTS);
+		}
+		else
+		 Terminal_flag &= ~(TIOCM_CTS);
+
+		return ioctl(portdesc,TIOCMBIS,&Terminal_flag);
+}
+
+
 
 // ****************************************************************************
 // SECTION : TODO (ce qui reste à faire)

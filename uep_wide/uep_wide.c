@@ -33,7 +33,7 @@
 
 #ifndef __ANIMATEDTEXT__
 #include <pthread.h>
-pthread_mutex_t fctcore_mtx_protection=PTHREAD_MUTEX_INITIALIZER;                                                                                                                         /* mutex interne */
+pthread_mutex_t fctcore_mtx_protection=PTHREAD_MUTEX_INITIALIZER;                                                                                               /* mutex interne */
 static bool	fctcore_brunning=true;																																																															/* flag interne */
 #define __ANIMATEDTEXT__
 #endif
@@ -540,6 +540,7 @@ int getch()
 // OBSOLETE, certains programmes qui l'utilisaient continueront à tourner mais
 // il est conseillé d'utiliser AddToMessageBoxEx().
 //*****************************************************************************
+
 void AddToMessageBox(char *pMessage,int posx,int maxX,int maxY,int basevert,unsigned short *pCurrentNumber)
 {
 	char *blankline=(char*)malloc(maxX);
@@ -593,49 +594,8 @@ void AddToMessageBox(char *pMessage,int posx,int maxX,int maxY,int basevert,unsi
 //							peuvent poser de gros soucis... (TODO: faire mieux). 
 //				
 //*****************************************************************************
-#ifdef OLDVERSION
-void AddToMessageBoxEx(char *pMessage,struct FakeWindowPos datas,unsigned short *pCurrentNumber)
-{
-	char *blankline=(char*)malloc(datas.Width+1);
-	wchar_t tmpString[datas.Width];
-	int cpt;
-	
-	if(*pCurrentNumber>datas.Height) return;
-	
-	if(datas.Width<4) return; // on affiche rien pour être sûr... 
-	
-	datas.FirstPrintableY--; // pour éviter une ligne blanche dans les fenêtres...	
-	
-	memset((void*)blankline,32,datas.Width);
-  blankline[datas.Width]='\0';
-	wmemset(tmpString,0,datas.Width);
-	tmpString[datas.Width]=L'\0';																									// mars 2015
-  
-	(*pCurrentNumber)++;
-	int taillereelle=wstrlen(pMessage);
-		
-	if(taillereelle>datas.Width)
-	{
-		mbstowcs(tmpString,pMessage,datas.Width-4);
-		wcscat(tmpString,L"...\0");
-	}
-	else
-	{
-		mbstowcs(tmpString,pMessage,taillereelle);
-	}
-	if((*pCurrentNumber)==datas.Height+1)
-	{
-		for(cpt=1;cpt<(*pCurrentNumber);cpt++)
-			AfficherXY(blankline,datas.FirstPrintableX,datas.FirstPrintableY+cpt);
-		(*pCurrentNumber)=1;
-	}
-	wprintf(L"\x1b[%d;%dH%ls",datas.FirstPrintableY+(*pCurrentNumber),datas.FirstPrintableX,tmpString);
-	fflush(stdout);
-	free(blankline);
-}
-#else
-void AddToMessageBoxEx(char *pMessage,struct FakeWindowPos *datas)
 
+void AddToMessageBoxEx(char *pMessage,struct FakeWindowPos *datas)
 {
 	char *blankline=(char*)malloc(datas->Width+1);
 	wchar_t tmpString[datas->Width];
@@ -654,10 +614,19 @@ void AddToMessageBoxEx(char *pMessage,struct FakeWindowPos *datas)
   
 	datas->nbMessages++;
 	int taillereelle=wstrlen(pMessage);
-		
+	
+	// L'ANSI fait bugger l'affichage...
+	
 	if(taillereelle>datas->Width)
 	{
-		mbstowcs(tmpString,pMessage,datas->Width-4);
+		if((strchr(pMessage,27))!=0) 
+		{
+			mbstowcs(tmpString,pMessage,datas->Width);
+		}
+		else
+		{
+			mbstowcs(tmpString,pMessage,datas->Width-4);
+		}
 		wcscat(tmpString,L"...\0");
 	}
 	else
@@ -676,10 +645,11 @@ void AddToMessageBoxEx(char *pMessage,struct FakeWindowPos *datas)
 	free(blankline);
 	//free(tmpString);
 }
-#endif
+
 //*****************************************************************************
 // ResetBox() juillet 202
 //*****************************************************************************
+
 void ResetBox(struct FakeWindowPos *datas)
 {
 	if(datas==NULL) return;
@@ -704,6 +674,7 @@ void ResetBox(struct FakeWindowPos *datas)
 //*****************************************************************************
 // Fonction getchAt() -- permet de positionner le curseur avant de faire un getch()
 //*****************************************************************************
+
 int getchAt(int posX,int posY)
 {
 	wprintf(L"\x1b[%d;%dH",posY,posX);
@@ -744,7 +715,6 @@ char* splitDateToTime(char *pCompleteDateString)
 //
 // Sortie: les heures, minutes, secondes écoulées dans une structure de type "chrono"
 // *****************************************************************************************************************************************************************
-
 
 chrono getTimeElapsed(char *pBegin,char *pEnd)
 {
@@ -880,9 +850,7 @@ char *getnchar(int maximum)
 			if(maximum>1) // ce bloc sera exécuté deux fois (un caractère utf8 est codé sur 2 bytes)...
 			{
 				if(*pTmp!=-61 && *pTmp!=-62) nbreCar++;																	// on ne compte le caractère que si nous avons traité les deux caractères UTF8
-				//strncpy(&toconvert,pTmp,2);																						// deux bytes à convertir en unicode
-				strncpy(toconvert,pTmp,2);
-				//int rc=mbtowc(&convertedCar,&toconvert,1);
+				strncpy(toconvert,pTmp,2);																							// deux bytes à convertir en unicode
 				int rc=mbtowc(&convertedCar,toconvert,1);
 				if(convertedCar>0 && rc>0) 																							// on affiche uniquement lorsque le caractère est valide...
 				{
@@ -898,15 +866,15 @@ char *getnchar(int maximum)
 				// such as by writing beyond the end of a buffer you allocated. 
 				
 				// valgrind indique des lectures, écritures et libérations (free/realloc/delete) dans realloc()...
+
 #ifdef AVANT				
 				pReturnPointer=(char*)realloc(pReturnPointer,sizeof(char)*adaptedsize);
 #else
 				//free(pReturnPointer);
-				pReturnPointer=(char*)calloc(adaptedsize,0); 	// BUG résolu, maintenant je n'ai aucune explications concernant le fait que realloc() fonctionne
-																											// "quand elle en a envie" :{
+				pReturnPointer=(char*)calloc(adaptedsize,sizeof(char)); 	// BUG résolu, maintenant je n'ai aucune explications concernant le fait que realloc() fonctionne
+																																	// "quand elle en a envie" :{
 #endif
-
-				pReturnPointer=pTmp-offset;																							// nous venons de changer la taille de la chaine il faut lui donner une valeur...
+				pReturnPointer=pTmp-offset;										// nous venons de changer la taille de la chaine il faut lui donner une valeur...
 								
 				offset++;
 				pTmp++;
@@ -916,9 +884,9 @@ char *getnchar(int maximum)
 				// Encodage... d'un seul caractère de type UTF8
 
 				pReturnPointer=(char*)realloc(pReturnPointer,sizeof(char)*3);		// le code -61 (ou -62), le code du caractère et \0...
-				pReturnPointer[0]=*pTmp;						// indique qu'il s'agit d'UTF8 (pour l'affichage)
-				pReturnPointer[1]=getch();					// les caractères UTF8 ne sont pas complets jusqu'à ce que 2 bytes aient été "saisis" le getch() ici récupère la partie manquante...
-				pReturnPointer[2]='\0';							// on indique la fin de la chaine...
+				pReturnPointer[0]=*pTmp;																				// indique qu'il s'agit d'UTF8 (pour l'affichage)
+				pReturnPointer[1]=getch();																			// les caractères UTF8 ne sont pas complets jusqu'à ce que 2 bytes aient été "saisis" le getch() ici récupère la partie manquante...
+				pReturnPointer[2]='\0';																					// on indique la fin de la chaine...
 				
 				// Affichage
 				
@@ -1046,6 +1014,7 @@ void SetCursor(int posx,int posy)
 //  colonnes: pointeur qui récupère la valeur en nombre de colonnes
 //  lignes:   pointeur qui récupère la valeur en nombre de lignes
 //*****************************************************************************
+
 void GetConsoleDimensions(unsigned int *colonnes,unsigned int *lignes)
 {
 	struct winsize Dimensions;
@@ -1668,7 +1637,7 @@ pthread_t DisplayAnimatedText(PositionCadre position,char *pTexte,struct s_RGB F
   		
   local_threadID=pthread_create(&pt_core,NULL,(void*)&fct_core,(void*)dat_donnees);
 	if(local_threadID==0) return pt_core;
-	return -1;					// mars 2019: erreur qui mérite la mort: pthread_create ne RETOURNE PAS UN IDENTIFIANT (il se trouve dans pt_core)
+	return (pthread_t)-1;					// mars 2019: erreur qui mérite la mort: pthread_create ne RETOURNE PAS UN IDENTIFIANT (il se trouve dans pt_core)
 }
 
 /* 

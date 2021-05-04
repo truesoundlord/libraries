@@ -40,30 +40,28 @@ unsigned int getPIDByName(char *p_processname)
 	char target_name[FILENAME_MAX];									// ??? buffer overrun potential
 	int target_result;
 	char exe_link[FILENAME_MAX];
-	//int errorcount;
 	int result;
 
 	//errorcount=0;
 	result=-1;
-	dir_p = opendir("/proc/"); 																// Open /proc/ directory
+	dir_p = opendir("/proc/"); 																												// Open /proc/ directory
 	while((dir_entry_p = readdir(dir_p))!=NULL) 
 	{											// Reading /proc/ entries
-		if (strspn(dir_entry_p->d_name, "0123456789") == strlen(dir_entry_p->d_name)) // Checking for numbered directories 
+		if (strspn(dir_entry_p->d_name, "0123456789") == strlen(dir_entry_p->d_name)) 	// Checking for numbered directories 
 		{		
 			strcpy(dir_name, "/proc/");
 			strcat(dir_name, dir_entry_p->d_name);
-			strcat(dir_name, "/"); 															// Obtaining the full-path eg: /proc/24657/ 
+			strcat(dir_name, "/"); 																												// Obtaining the full-path eg: /proc/24657/ 
 			exe_link[0] = 0;
 			strcat(exe_link, dir_name);
-			strcat(exe_link, "exe");													 	// Getting the full-path of that exe link (répertoire exe dans /proc)
-			target_result = readlink(exe_link, target_name, sizeof(target_name)-1);			// Getting the target of the exe ie to which binary it points to
+			strcat(exe_link, "exe");													 														// Getting the full-path of that exe link (répertoire exe dans /proc)
+			target_result = readlink(exe_link, target_name, sizeof(target_name)-1);				// Getting the target of the exe ie to which binary it points to
 			if (target_result > 0) 
 			{
 				target_name[target_result] = 0;
-				if (strstr(target_name, p_processname)!=NULL) // Searching for process name in the target name -- ??? could be a better search !!!
+				if (strstr(target_name, p_processname)!=NULL) 															// Searching for process name in the target name -- ??? could be a better search !!!
 				{							
 					result = atoi(dir_entry_p->d_name);
-					//fprintf(stderr,"getProcessID(%s) :Found. id = %d\n", p_processname, result);
 					closedir(dir_p);
 					return result;
 				}
@@ -71,7 +69,6 @@ unsigned int getPIDByName(char *p_processname)
 		}
 	}
 	closedir(dir_p);
-	//fprintf(stderr,"getProcessID(%s) : id = 0 (could not find process)\n", p_processname);
 	return result;
 } 
 

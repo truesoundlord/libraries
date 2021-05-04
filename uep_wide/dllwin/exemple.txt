@@ -1,0 +1,20 @@
+dllwin:		uep_wide.c uep_wide.h setElementEx.c getElementEx.c
+		@echo "Librairie partagée compilée..."
+		@echo "...installation au niveau du système d'exploitation !!"
+		gcc -c -fPIC -O3 uep_wide.c -o libuepwide.o
+		@echo "...compilation des add-ons..."
+		gcc -c -fPIC -O3 setElementEx.c -o setElementEx.o
+		gcc -c -fPIC -O3 getElementEx.c -o getElementEx.o
+		gcc -c -fPIC -O3 getPIDByName.c -o getPIDByName.o
+		@echo "...compilation de la librairie..."
+		gcc -shared -Wall libuepwide.o setElementEx.o getElementEx.o getPIDByName.o -lpthread -lm -o uepwide.dll 
+		@cp uep_wide.dll /usr/lib
+		@echo "TERMINE"
+		
+
+hurukan@VirtualWin7 MSYS /librairies/uep_wide/tests/getnchar
+# make
+cc `pkg-config uepwide --cflags`  `pkg-config uepwide --libs`  test1.c   -o test1
+/usr/lib/gcc/x86_64-pc-msys/10.2.0/../../../../x86_64-pc-msys/bin/ld: cannot find -luepwide
+collect2: error: ld returned 1 exit status
+make: *** [<builtin>: test1] Error 1
