@@ -1,5 +1,5 @@
 #! /bin/bash
-export SITE="https://github.com/truesoundlord/saintmartin"
+export SITE="https://github.com/truesoundlord/libraries"
 export LOCALFLDR="/librairies/*"
 export GITFLDR="/root/NetBeansProjects/UEP/"
 echo "Faire remonter les modifications sur le site $SITE !!"
