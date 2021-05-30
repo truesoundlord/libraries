@@ -6,8 +6,8 @@ echo "Faire remonter les modifications sur le site $SITE !!"
 mkdir -p $GITFLDR
 cd $GITFLDR
 echo "Nous sommes dans le répertoire $(pwd)"
-git clone $SITE saintmartin
-cd saintmartin
+git clone $SITE libraries
+cd libraries
 /usr/bin/cp -Rfv $LOCALFLDR .
 cp -f /utilitaires/shell/école/*.sh $GITFLDR/compile
 purgeall -d uep_wide -e -o -s
