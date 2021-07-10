@@ -374,7 +374,7 @@ int lc_delete(ListeChainee *pListe,int targetID)
 					{
 						lc_parcours->pFree(lc_parcours);
 					}
-					free(lc_parcours);
+					// free(lc_parcours);
 					return elementprecedent;
 				}
 				if(lc_parcours->pPrevious==NULL && lc_parcours->pNext!=NULL)
@@ -389,7 +389,7 @@ int lc_delete(ListeChainee *pListe,int targetID)
 					{
 						lc_parcours->pFree(lc_parcours);
 					}
-					free(lc_parcours);
+					// free(lc_parcours);
 					return 1;
 				}
 				if(lc_parcours->pNext==NULL && lc_parcours->pPrevious!=NULL)
@@ -404,7 +404,7 @@ int lc_delete(ListeChainee *pListe,int targetID)
 					{
 						lc_parcours->pFree(lc_parcours);
 					}
-					free(lc_parcours);
+					// free(lc_parcours);
 					return 2;
 				}
 				// Cas du pNext ET pPrevious tous deux à NULL (il ne reste plus qu'un seul élément, on l'enlève)...
@@ -414,7 +414,7 @@ int lc_delete(ListeChainee *pListe,int targetID)
 				{
 					lc_parcours->pFree(lc_parcours);
 				}
-				free(lc_parcours);
+				// free(lc_parcours);
 				return 3;
 			} // endif
 			lc_parcours=lc_parcours->pNext;
