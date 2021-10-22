@@ -2,8 +2,10 @@
 #include <stdlib.h>
 
 #include <time.h>
+#include <wchar.h>
 
 #include <linkedlist.h>
+#include <uep_wide.h>
 
 LinkedList *test1;
 LinkedList *test2;
@@ -14,6 +16,8 @@ struct timespec respire={0L,30000000L};
 
 int 	iRandom;
 char	*Random;
+
+char 	Message[80];
 
 typedef struct s_Random
 {
@@ -33,8 +37,10 @@ void main(void)
 	test3=lc_init();
 	test4=lc_init();
 	
+	EffacerEcran();
 	while(cpt<1200)
 	{
+		
 		srand(time(NULL));
 		t_Random *tmpRand=malloc(sizeof(t_Random));
 		iRandom=rand()%40+1;
@@ -60,14 +66,17 @@ void main(void)
 		lc_add((void*)tmpRand,test3,cssmuserdef,sizeof(t_Random));
 		lc_add((void*)Random,test4,cssmuserdef,sizeof(char*));
 		
-		
-				
+		sprintf(Message,"Progress %04.0f%% %04d",(float)(test1->NbElem/1200.0)*100.0,test1->NbElem);
 		nanosleep(&respire,NULL);
+		AfficherXY(Message,1,1);
 		
 		cpt++;
 	}
-	printf("%04d %04d %04d %04d\n",test1->NbElem,test2->NbElem,test3->NbElem,test4->NbElem);
-			
-	
+	wprintf(L"\n%04d %04d %04d %04d\n",test1->NbElem,test2->NbElem,test3->NbElem,test4->NbElem);
+	lc_empty(test1);
+	lc_empty(test2);
+	lc_empty(test3);
+	lc_empty(test4);
+	BackToShell(2,1);
 	
 }

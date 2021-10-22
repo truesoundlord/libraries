@@ -51,7 +51,7 @@ short getDescriptors(int *paramstdout, int *paramstderr, char *paramFile)
 	
 	// printf("[DEBUG] %04d\n",errno);
 	
-	if(errno!=EEXIST && errno!=ENOENT && errno!=ESPIPE && errno!=11) 				// il faut ignorer le "no such file or directory" (errno 2) et errno 11 (resource temporarily unavailable)
+	if(errno!=EEXIST && errno!=ENOENT && errno!=ESPIPE && errno!=11 && errno!=0) 				// il faut ignorer le "no such file or directory" (errno 2) et errno 11 (resource temporarily unavailable)
 	{
 		perror("[cssmdebugtool] mkdir() failed to create folder ");
 		return ERR_IOERROR;

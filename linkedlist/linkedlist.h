@@ -75,10 +75,10 @@ lc_Datas* lc_search(ListeChainee*,int);                         // ATTENTION: le
 lc_Datas* lc_get(ListeChainee*,int);														// ATTENTION: le "int" en question est un indice !!             
 lc_Datas* lc_lastget(ListeChainee*,int);                        // récupère (sans l'effacer) l'élément se trouvant en fin de liste...
 
-LinkedList*		lc_init(void);																			// initialise une liste chaînée
-t_cssmarray*	wraparray(void*,int,int,int);												// encapsule un tableau de x dimensions de n'importe quel type
+LinkedList*		lc_init(void);																		// initialise une liste chaînée
+t_cssmarray*	wraparray(void*,int,int,int);											// encapsule un tableau de x dimensions de n'importe quel type
 
-int lc_FindByValue(LinkedList*,void*,bool (*)(void*,void*));			// compare deux éléments par leur valeur dans une fonction fournie en dernier paramètre
+int lc_FindByValue(LinkedList*,void*,bool (*)(void*,void*));		// compare deux éléments par leur valeur dans une fonction fournie en dernier paramètre
 
 #endif
 

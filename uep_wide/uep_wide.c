@@ -211,6 +211,7 @@ struct FakeWindowPos DrawBoxWithRGB(int posX,int posY,int height,int length,stru
 	wprintf(L"%s%lc",pColorBoxString,UTF8_COININFDROIT);
 	wprintf(L"\x1b[0m");
 	fflush(stdout);
+	free(pColorBoxString); // 2021 (memory leak)
 	return (struct FakeWindowPos){origineX,origineY,length,height,origineX+1,origineY+1,origineY+height+2};
 }
 
@@ -354,6 +355,8 @@ struct FakeWindowPos DrawTitledBoxWithRGB(int posX,int posY,int height,int lengt
 	wprintf(L"\x1b[0m");
 	wprintf(L"\x1b[u");							/* restaure la position sauvegardée */
 	fflush(stdout);
+	free(pColorBoxString);				// 2021 
+	free(pColorTitleString);			// 2021 (memory leak)
 	return (struct FakeWindowPos){origineX,origineY,length,height,origineX+1,origineY+1,origineY+height+2};
 }
 
@@ -643,7 +646,6 @@ void AddToMessageBoxEx(char *pMessage,struct FakeWindowPos *datas)
 	wprintf(L"\x1b[%d;%dH%ls",posY+datas->nbMessages,datas->FirstPrintableX,tmpString);
 	fflush(stdout);
 	free(blankline);
-	//free(tmpString);
 }
 
 //*****************************************************************************
@@ -773,8 +775,6 @@ chrono getTimeElapsed(char *pBegin,char *pEnd)
 		tmpTempsEcoule.Minutes--;
 		tmpTempsEcoule.Secondes=(60-atoi(DatasBegin[2]))+atoi(DatasEnd[2]); // cas de la partie commencée à 09:16:12 et terminée à 09:39:02 
 	}
-	//free(SplittedBegin);
-	//free(SplittedEnd);		 // ACHTUNG !!
 	return tmpTempsEcoule;
 }
 

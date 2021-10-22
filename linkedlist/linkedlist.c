@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <regex.h>
 #endif
 
 //*****************************************************************************
@@ -547,7 +548,7 @@ void lc_showList(ListeChainee *pListe)
 long lc_empty(ListeChainee *pListe)
 {
 	long	MemoryFreed=0L;
-	int		identifiant;
+	// int		identifiant;
 	
 	while(pListe->pHead!=NULL)
 	{
@@ -853,3 +854,4 @@ int lc_FindByValue(LinkedList *depot,void *value,bool (*fctcmp)(void*,void*))
 	}
 	return -1;
 }
+
