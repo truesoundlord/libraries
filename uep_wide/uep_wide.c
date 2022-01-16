@@ -1361,7 +1361,13 @@ int nbgetch(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldtcfg); 
 	
 	Detournement.sa_handler=SIG_IGN;
-	// On ne peut pas interrompre le getch...
+		
+	//sigaction(SIGINT,&Detournement,NULL); 2021
+	
+	// 2021
+	
+	Detournement.sa_handler=SIG_DFL;
+	Detournement.sa_flags=0;
 	sigaction(SIGINT,&Detournement,NULL);
 	
 	return Buffer;
