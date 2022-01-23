@@ -8,11 +8,11 @@ getPIDByName.o: getPIDByName.c
 sharedlibrary: 	uep_wide.c uep_wide.h setElementEx.c getElementEx.c
 		@echo "Librairie partagée compilée..."
 		@echo "...installation au niveau du système d'exploitation !!"
-		gcc -c -fPIC -O3 uep_wide.c -o libuepwide.o
+		gcc -c -O3 -fPIC uep_wide.c -g -o libuepwide.o
 		@echo "...compilation des add-ons..."
-		gcc -c -fPIC -O3 setElementEx.c -o setElementEx.o
-		gcc -c -fPIC -O3 getElementEx.c -o getElementEx.o
-		gcc -c -fPIC -O3 getPIDByName.c -o getPIDByName.o
+		gcc -c -O3 -fPIC setElementEx.c -g -o setElementEx.o
+		gcc -c -O3 -fPIC getElementEx.c -g -o getElementEx.o
+		gcc -c -O3 -fPIC getPIDByName.c -g -o getPIDByName.o
 		@echo "...compilation de la librairie..."
 		gcc -shared -Wl,-soname,libuepwide.so libuepwide.o setElementEx.o getElementEx.o getPIDByName.o -lpthread -lm -o libuepwide.so.1.0.1
 		@cp -v libuepwide.so.1.0.1 /usr/lib64

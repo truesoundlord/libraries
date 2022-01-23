@@ -19,7 +19,7 @@ purgeall -d gfxContainer -e -o -s
 git add .
 git status
 git commit -a -m "Version $(date +%m).$(date +%Y)"
-git push https://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@github.com/truesoundlord/libraries.git
+git push
 echo "Libération de l'espace non nécessaire..."
 /usr/bin/rm -Rf $GITFLDR
 echo "Terminé !!"

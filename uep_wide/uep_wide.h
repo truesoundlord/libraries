@@ -84,11 +84,11 @@ typedef struct
 
 struct s_RGB
 {
-  short Red;
-  short Green;
-  short Blue;
+  unsigned short Red;
+  unsigned short Green;
+  unsigned short Blue;
   bool  bold;
-  short alpha;  // facilite la gestion de la transparence en SDL2 
+  unsigned short alpha;  // facilite la gestion de la transparence en SDL2 
 };
 
 // Structure qui devrait permettre de pouvoir adresser une "fenêtre" (fausse fenêtre) sur un écran
