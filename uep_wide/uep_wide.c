@@ -15,7 +15,7 @@
 #include <time.h>
 #include <wchar.h>
 
-#ifdef WINDOWS
+#if (_WIN64 || _WIN32)
 #include <conio.h>
 #else
 #define LINUX
@@ -366,16 +366,7 @@ struct FakeWindowPos DrawTitledBoxWithRGB(int posX,int posY,int height,int lengt
 ******************************************************************************/
 char* getRGBString(struct s_RGB target)
 {
-	//wprintf(L"\n[DEBUG] %d;%d;%d %d (%d)\n",target.Red,target.Green,target.Blue,target.bold,target.alpha);
-	
-#ifdef AVANT
-	char *pTmp=(char*)malloc(sizeof(char)*25); // \x1b[38;2;xxx;xxx;xxxm 
-	memset(pTmp,0,25);
-#else
 	char *pTmp=(char*)calloc(25,sizeof(char)); // \x1b[38;2;xxx;xxx;xxxm 
-#endif
-			
-	//sprintf(pTmp,"\x1b[38;2;%d;%d;%d%s\0",target.Red,target.Green,target.Blue,target.bold?";1m":"m");
 	sprintf(pTmp,"\x1b[38;2;%d;%d;%dm",target.Red,target.Green,target.Blue);
 	return pTmp;
 }
@@ -385,13 +376,7 @@ char* getRGBString(struct s_RGB target)
 *****************************************************************************/
 char* getReverseRGBString(struct s_RGB target)
 {
-#ifdef AVANT
-	char *pTmp=(char*)malloc(sizeof(char)*25); // \x1b[48;2;xxx;xxx;xxxm 
-	memset(pTmp,0,25);
-#else
 	char *pTmp=(char*)calloc(25,sizeof(char)); // \x1b[48;2;xxx;xxx;xxxm 
-#endif	
-	//sprintf(pTmp,"\x1b[48;2;%d;%d;%d%s\0",target.Red,target.Green,target.Blue,target.bold?";1m":"m");
 	sprintf(pTmp,"\x1b[48;2;%d;%d;%dm",target.Red,target.Green,target.Blue);
 	return pTmp;
 }
@@ -525,7 +510,7 @@ void EffacerEcran()
 int getch() 
 {
   struct termios oldt, newt;
-	struct sigaction Detournement={ { 0 } };
+	struct sigaction Detournement={{0}};
 		
 	Detournement.sa_handler=SIG_IGN;
 	// On ne peut pas interrompre le getch...
@@ -1237,14 +1222,11 @@ void InitUEPWIDE(char *pLocale)
 
 void setForegroundColor(struct s_RGB color)
 {
-	//wprintf(L"[%s] DEBUG --> %d;%d;%d %d (%d)\n",__func__,color.Red,color.Green,color.Blue,color.bold,color.alpha);
-	
 	char *couleurAvantPlan=getRGBString(color);
 	if(color.bold) wprintf(L"\x1b[1m");
 	else wprintf(L"\x1b[0m");
 	wprintf(L"%s",couleurAvantPlan);
 	fflush(stdout);
-	//wprintf(L"\x1b[0m");
 	free(couleurAvantPlan);
 }
 
@@ -1261,7 +1243,6 @@ void setBackgroundColor(struct s_RGB color)
 {
 	char *couleurFond=getReverseRGBString(color);
 	wprintf(L"%s",couleurFond);
-	// wprintf(L"\x1b[0m");
 	free(couleurFond);
 }
 
