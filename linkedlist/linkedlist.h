@@ -4,8 +4,7 @@
 #include <stdbool.h>
 
 enum{cssmuserdef=-1,cssmbyte=1,cssmshort,cssmint=4,cssmfloat,cssmlong,cssmllong=8,cssmdouble,cssmldouble};
-
-static unsigned int gen_Number=1000;                            // pour pouvoir différencier un élément de la liste par rapport à un autre
+enum{uepuserdef=-1,uepbyte=1,uepshort,uepint=4,uepfloat,ueplong,uepllong=8,uepdouble,uepldouble};
 
 typedef struct item_Datas
 {
@@ -39,7 +38,6 @@ typedef struct s_array																					// encapsulation d'un tableau
 	unsigned int		sizez;
 		
 }t_cssmarray;
-
 
 
 typedef ListeChainee LinkedList;                                // un alias...
@@ -79,6 +77,7 @@ LinkedList*		lc_init(void);																		// initialise une liste chaînée
 t_cssmarray*	wraparray(void*,int,int,int);											// encapsule un tableau de x dimensions de n'importe quel type
 
 int lc_FindByValue(LinkedList*,void*,bool (*)(void*,void*));		// compare deux éléments par leur valeur dans une fonction fournie en dernier paramètre
+LinkedList* lc_sort(LinkedList*,int(*)(void*,void*),bool);			// permet d'effectuer le tri décroissant/croissant en fonction de la valeur du bool
 
 #endif
 

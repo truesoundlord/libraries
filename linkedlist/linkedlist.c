@@ -65,6 +65,8 @@ Searching for 79626
 // Juiller 2020: tentative de recherche en fonction de l'item
 // TODO : exécuter un thread et collecter serait peut-être bénéfique
 
+static unsigned int gen_Number=1000;                            // pour pouvoir différencier un élément de la liste par rapport à un autre
+
 lc_Datas* lc_get(ListeChainee *pListe,int position) 
 {
 	int cptInternal=0;
@@ -199,7 +201,8 @@ lc_Datas* lc_search(ListeChainee *pListe,int itemid)
 
 int lc_insert(void *pData,ListeChainee *pListe,short type,short taille) 
 {
-	lc_Datas *lc_new=(lc_Datas*)malloc(sizeof(lc_Datas));
+	//lc_Datas *lc_new=(lc_Datas*)malloc(sizeof(lc_Datas));
+	lc_Datas *lc_new=calloc(1,sizeof(lc_Datas));
 	lc_Datas *seekLast;
 	
 	if(lc_new==NULL) return -1;							// modifié en juillet 2016
@@ -270,7 +273,8 @@ int lc_insert(void *pData,ListeChainee *pListe,short type,short taille)
 
 int lc_add(void *pData,ListeChainee *pListe,short type,short taille)
 {
-  lc_Datas *lc_new=(lc_Datas*)malloc(sizeof(lc_Datas));
+  //lc_Datas *lc_new=(lc_Datas*)malloc(sizeof(lc_Datas));
+	lc_Datas *lc_new=calloc(1,sizeof(lc_Datas));
 	lc_Datas *seekFirst=NULL; // dec2017 puis juillet 2020
   if(lc_new==NULL || pListe==NULL) return -1; // juillet 2020
 	
@@ -621,7 +625,7 @@ unsigned int lc_getHeadID(ListeChainee *pListe)
 //*****************************************************************************
 // lc_getTailID
 //
-// Récupère la valeur de l'identifiant de l'élément de tête
+// Récupère la valeur de l'identifiant de l'élément en fin de liste 
 //
 // ENTREES:
 //	pListe: pointeur sur un élément de type ListeChainee
@@ -642,7 +646,7 @@ unsigned int lc_getTailID(ListeChainee *pListe)
 //*****************************************************************************
 // lc_getIDat
 //
-// Récupère la valeur de l'identifiant de l'élément de tête
+// Récupère la valeur de l'identifiant de l'élément spécifié à une position donnée
 //
 // ENTREES:
 //	pListe: 	pointeur sur un élément de type ListeChainee
@@ -753,7 +757,7 @@ LinkedList* lc_init(void)
 //*****************************************************************************
 t_cssmarray* wraparray(void *pArray,int nbcols,int nblins,int depth)
 {
-	t_cssmarray *tmp=malloc(sizeof(t_cssmarray));
+	t_cssmarray *tmp=calloc(1,sizeof(t_cssmarray));
 	*tmp=(t_cssmarray){pArray,nbcols,nblins,depth};
 	
 	return tmp;
@@ -849,5 +853,112 @@ int lc_FindByValue(LinkedList *depot,void *value,bool (*fctcmp)(void*,void*))
 		pSeek=pSeek->pNext;
 	}
 	return -1;
+}
+
+//*************************************
+// lc_sort (2022)
+// 
+// Fonction qui permet de trier des données d'une liste chaînée
+// Attention: il faut que les données soient du même type !!!!!
+//
+// Input:
+//	source: une liste chaînée contenant des éléments du même type
+//	fctcompare: fonction de comparaison pour les structures de données complexes
+//	Ascending: à false indique le tri par ordre décroissant
+//
+// Output:
+//	retourne un pointeur sur une structure de donnée de type LinkedList.
+
+LinkedList* lc_sort(LinkedList *source,int (*fctcompare)(void*,void*),bool Ascending)
+{
+	LinkedList	*tmpList=lc_init();
+	lc_Datas		*reference=NULL;
+		
+	int position=1;
+	
+	if(source==NULL) return NULL;
+		
+	
+	lc_Datas		*compareme;
+	lc_Datas		*parcours;
+	do
+	{
+		parcours=source->pHead;
+		if(parcours==NULL) break;																							
+		
+		compareme=lc_get(source,position);
+		
+		if(compareme==NULL) // cas du dernier élément non trié... automatiquement le plus petit/grand
+		{
+			int ItemID=lc_add(parcours->value,tmpList,parcours->dataType,parcours->dataSize);
+			lc_setDisplayByID(tmpList,ItemID,parcours->pDisplay);
+			lc_delete(source,parcours->item_Number);
+			break;
+		}
+		reference=compareme;
+		
+		if(parcours->dataType!=compareme->dataType) break;															// on ne compare pas des pommes et des poires (ni C et Python)
+		if(parcours->dataType==uepuserdef && fctcompare==NULL) break;										// si il n'y a pas de fonction de comparaison on quitte
+			
+		do
+		{
+			if(!Ascending)
+			{
+				switch(parcours->dataType)
+				{
+					case uepbyte:			if(*((char*)parcours->value)>*((char*)reference->value)) reference=parcours;
+														break;
+					case uepshort:    if(*((short*)parcours->value)>*((short*)reference->value)) reference=parcours;
+														break;
+					case uepint:			if(*((int*)parcours->value)>*((int*)reference->value)) reference=parcours;
+														break;
+					case uepfloat:		if(*((float*)parcours->value)>*((float*)reference->value)) reference=parcours;
+														break;
+					case ueplong:			if(*((long*)parcours->value)>*((long*)reference->value)) reference=parcours;
+														break;
+					case uepllong:	  if(*((long long*)parcours->value)>*((long long*)reference->value)) reference=parcours;
+														break;
+					case uepdouble:		if(*((double*)parcours->value)>*((double*)reference->value)) reference=parcours;
+														break;
+					case uepldouble:	if(*((long double*)parcours->value)>*((long double*)reference->value)) reference=parcours;
+														break;	
+					default:					if(fctcompare(parcours->value,reference->value)>0) reference=parcours;
+				}
+			}
+			else
+			{
+				switch(parcours->dataType)
+				{
+					case uepbyte:			if(*((char*)parcours->value)<*((char*)reference->value)) reference=parcours;
+														break;
+					case uepshort:    if(*((short*)parcours->value)<*((short*)reference->value)) reference=parcours;
+														break;
+					case uepint:			if(*((int*)parcours->value)<*((int*)reference->value)) reference=parcours;
+														break;
+					case uepfloat:		if(*((float*)parcours->value)<*((float*)reference->value)) reference=parcours;
+														break;
+					case ueplong:			if(*((long*)parcours->value)<*((long*)reference->value)) reference=parcours;
+														break;
+					case uepllong:	  if(*((long long*)parcours->value)<*((long long*)reference->value)) reference=parcours;
+														break;
+					case uepdouble:		if(*((double*)parcours->value)<*((double*)reference->value)) reference=parcours;
+														break;
+					case uepldouble:	if(*((long double*)parcours->value)<*((long double*)reference->value)) reference=parcours;
+														break;	
+					default:					if(fctcompare(parcours->value,reference->value)<0) reference=parcours;
+				}
+			}
+							
+			parcours=parcours->pNext;
+		}while(parcours!=NULL);
+		// Ici nous avons l'élément le plus grand de la collection de valeurs...
+		lc_Datas *copy=lc_search(source,reference->item_Number);
+		int ItemID=lc_add(copy->value,tmpList,reference->dataType,reference->dataSize);
+		lc_setDisplayByID(tmpList,ItemID,compareme->pDisplay);
+		lc_delete(source,reference->item_Number);
+		reference=NULL;
+	}while(source->NbElem>0);
+	// La liste devrait être triée
+	return tmpList;
 }
 
