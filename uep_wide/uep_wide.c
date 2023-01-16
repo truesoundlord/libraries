@@ -1,5 +1,5 @@
 /*
- * Dimitri "hurukan" 2010-2019 <soundlord@gmail.com> Ubuntu Edutainment Project
+ * Dimitri "hurukan" 2010-2023 <soundlord@gmail.com> Ubuntu Edutainment Project
  */
 
 // This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
