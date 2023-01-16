@@ -913,7 +913,7 @@ char *getncharAt(int posx,int posy,int maximum)
 }
 
 // wstrlen
-// wcslen ne s'applique qu'à une chaine dite "wide" (contenu des caractères unicode)
+// wcslen ne s'applique qu'à une chaine dite "wide" (contenant des caractères unicode)
 
 //******************************************************************
 // wstrlen permet de calculer le nombre de caractères d'une chaine
