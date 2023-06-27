@@ -30,9 +30,168 @@
 #define UTF8_CROISEMENT			0x254B
 #endif
 
-#define ALIGN_LEFT          0
-#define ALIGN_CENTER        1
-#define ALIGN_RIGHT         2
+#ifndef COLORSDEFINED
+#define COLORSDEFINED
+
+// FIRST DRAW
+
+#define COL_RED {255,0,0,false,0}	
+#define COL_GRE {170,255,0,false,0}
+#define COL_YEL {255,255,191,false,0}
+#define COL_BLU {80,170,255,false,0}
+#define COL_MAG {117,80,123,false,0}
+#define COL_CYA {85,255,255,false,0}
+#define COL_ORA {255,128,0,false,0}
+#define COL_WHI {255,255,255,false,0}
+#define COL_PNK {255,170,255,false,0}
+
+#define COL_BR_RED {239,41,41,true,0}
+#define COL_BR_GRE {198,255,216,true,0}
+#define COL_BR_YEL {252,233,79,true,0}
+#define COL_BR_BLU {50,175,255,true,0}
+#define COL_BR_MAG {173,127,168,true,0}
+#define COL_BR_CYA {52,226,255,true,0}
+#define COL_BR_WHI {255,255,255,true,0}
+#define COL_BR_PNK {255,170,255,true,0}
+#define COL_BR_ORA {255,128,0,true,0}
+
+
+#define COL_INDIANRED		{205,92,92,false,0}
+#define COL_LIGHTCORAL	{240,128,128,false,0}
+#define COL_SALMON			{250,128,114,false,0}
+#define COL_DRKSALMON		{233,150,122,false,0}
+#define COL_LGTSALMON		{255,160,122,false,0}
+#define COL_CRIMSON			{220,20,60,false,0}
+#define COL_FIREBRICK		{178,34,34,false,0}
+#define COL_DRKRED			{139,0,0,false,0}
+
+#define COL_PINK				{255,192,203,false,0}
+#define COL_LGTPINK			{255,182,193,false,0}
+#define COL_HOTPINK			{255,105,180,false,0}
+#define COL_DEEPPINK		{255,20,147,false,0}
+#define COL_MEDVIOLET		{199,21,133,false,0}
+#define COL_PALEVIOLET	{219,112,147,false,0}
+
+#define COL_TOMATO				{255,99,71,false,0}
+#define COL_ORANGERED			{255,59,0,false,0}
+#define COL_DRKORANGE			{255,140,0,false,0}
+#define COL_ORANGE				{255,165,0,false,0}
+#define COL_Gold					{255,215,0,false,0}
+#define COL_Yellow				{255,255,0,false,0}
+#define COL_LightYellow		{255,255,224,false,0}
+#define COL_LemonChiffon	{255,250,205,false,0}
+#define COL_LgtGdnrodYel	{250,250,210,false,0}
+#define COL_PapayaWhip 		{255,239,213,false,0}
+#define COL_Moccasin			{255,228,181,false,0}
+#define COL_PeachPuff			{255,218,185,false,0}
+#define COL_PaleGoldenrod {238,232,170,false,0}
+#define COL_Khaki					{240,230,140,false,0}
+#define COL_DarkKhaki			{189,183,107,false,0}
+
+#define COL_Lavender				{230,230,250,false,0}
+#define COL_Thistle					{216,191,216,false,0}
+#define COL_Plum						{221,160,221,false,0}
+#define COL_Violet					{238,130,238,false,0}
+#define COL_Orchid					{218,112,214,false,0}
+#define COL_Fuchsia					{255,0,255,false,0}
+#define COL_Magenta					{255,0,255,false,0}
+#define COL_MediumOrchid		{186,85,211,false,0}
+#define COL_MediumPurple		{147,112,219,false,0}
+#define COL_RebeccaPurple		{102,51,153,false,0}
+#define COL_BlueViolet			{138,43,226,false,0}
+#define COL_DarkViolet			{148,0,211,false,0}
+#define COL_DarkOrchid			{153,50,204,false,0}
+#define COL_DarkMagenta			{139,0,139,false,0}
+#define COL_Purple					{128,0,128,false,0}
+#define COL_Indigo					{75,0,130,false,0}
+#define COL_SlateBlue				{106,90,205,false,0}
+#define COL_DarkSlateBlue 	{72,61,139,false,0}
+#define COL_MediumSlateBlue {123,104,238,false,0}
+
+#define COL_GreenYellow				{173,255,47,false,0}
+#define COL_Chartreuse				{127,255,0,false,0}
+#define COL_LawnGreen					{124,252,0,false,0}
+#define COL_Lime							{0,255,0,false,0}
+#define COL_LimeGreen					{50,205,50,false,0}
+#define COL_PaleGreen					{152,251,152,false,0}
+#define COL_LightGreen				{144,238,144,false,0}
+#define COL_MediumSpringGreen {0,250,154,false,0}
+#define COL_SpringGreen				{0,255,127,false,0}
+#define COL_MediumSeaGreen 	 	{60,179,113,false,0}
+#define COL_SeaGreen					{46,139,87,false,0}
+#define COL_ForestGreen				{34,139,34,false,0}
+#define COL_Green							{0,128,0,false,0}
+#define COL_DarkGreen					{0,100,0,false,0}
+#define COL_YellowGreen				{154,205,50,false,0}
+#define COL_OliveDrab					{107,142,35,false,0}
+#define COL_Olive							{128,128,0,false,0}
+#define COL_DarkOliveGreen 	 	{85,107,47,false,0}
+#define COL_MediumAquamarine	{102,205,170,false,0}
+#define COL_DarkSeaGreen			{143,188,139,false,0}
+#define COL_LightSeaGreen			{32,178,170,false,0}
+#define COL_DarkCyan					{0,139,139,false,0}
+#define COL_Teal							{0,128,128,false,0}
+
+#define COL_Aqua						{0,255,255,false,0}
+#define COL_Cyan						{0,255,255,false,0}
+#define COL_LightCyan				{224,255,255,false,0}
+#define COL_PaleTurquoise	 	{175,238,238,false,0}
+#define COL_Aquamarine			{127,255,212,false,0}
+#define COL_Turquoise				{64,224,208,false,0}
+#define COL_MediumTurquoise	{72,209,204,false,0}
+#define COL_DarkTurquoise  	{0,206,209,false,0}
+#define COL_CadetBlue				{95,158,160,false,0}
+#define COL_SteelBlue				{70,130,180,false,0}
+#define COL_LightSteelBlue 	{176,196,222,false,0}
+#define COL_PowderBlue			{176,224,230,false,0}
+#define COL_LightBlue				{173,216,230,false,0}
+#define COL_SkyBlue					{135,206,235,false,0}
+#define COL_LightSkyBlue		{135,206,250,false,0}
+#define COL_DeepSkyBlue			{0,191,255,false,0}
+#define COL_DodgerBlue			{30,144,255,false,0}
+#define COL_CornflowerBlue 	{100,149,237,false,0}
+#define COL_MediumSlateBlue	{123,104,238,false,0}
+#define COL_RoyalBlue				{65,105,225,false,0}
+#define COL_Blue						{0,0,255,false,0}
+#define COL_MediumBlue			{0,0,205,false,0}
+#define COL_DarkBlue				{0,0,139,false,0}
+#define COL_Navy						{0,0,128,false,0}
+#define COL_MidnightBlue		{25,25,112,false,0}
+
+#define COL_Cornsilk				{255,248,220,false,0}
+#define COL_BlanchedAlmond 	{255,235,205,false,0}
+#define COL_Bisque					{255,228,196,false,0}
+#define COL_NavajoWhite			{255,222,173,false,0}
+#define COL_Wheat						{245,222,179,false,0}
+#define COL_BurlyWood				{222,184,135,false,0}
+#define COL_Tan							{210,180,140,false,0}
+#define COL_RosyBrown				{188,143,143,false,0}
+#define COL_SandyBrown			{244,164,96,false,0}
+#define COL_Goldenrod				{218,165,32,false,0}
+#define COL_DarkGoldenrod  	{184,134,11,false,0}
+#define COL_Peru						{205,133,63,false,0}
+#define COL_Chocolate				{210,105,30,false,0}
+#define COL_SaddleBrown			{139,69,19,false,0}
+#define COL_Sienna					{160,82,45,false,0}
+#define COL_Brown						{165,42,42,false,0}
+#define COL_Maroon					{128,0,0,false,0}
+
+#define COL_Gainsboro				{220,220,220,false,0}
+#define COL_LightGray				{211,211,211,false,0}
+#define COL_Silver					{192,192,192,false,0}
+#define COL_DarkGray				{169,169,169,false,0}
+#define COL_Gray						{128,128,128,false,0}
+#define COL_DimGray					{105,105,105,false,0}
+#define COL_LightSlateGray 	{119,136,153,false,0}
+#define COL_SlateGray				{112,128,144,false,0}
+#define COL_DarkSlateGray  	{47,79,79,false,0}
+#define COL_Black						{0,0,0,false,0}
+
+#endif
+
+#define ALIGN_LEFT				0
+#define ALIGN_CENTER			1
+#define ALIGN_RIGHT				2
 
 #define COLORED_BOX				0
 #define COLORED_TITLE 		1
@@ -54,6 +213,13 @@
 
 #define SIZEDATE	26
 #define LOGBUF 		48
+
+//*****************************************************************************
+// Définition des macros (2022)
+//*****************************************************************************
+
+#define ClearScreen EffacerEcran
+#define DisplayXY		AfficherXY
 
 //*****************************************************************************
 // Définition des structures utilisées
@@ -150,7 +316,7 @@ void  AfficherXY(char*,int,int);																														// Affiche un text
 void  BackToShell(short,short);																															// Fonction qui permet d'afficher le prompt au bon endroit
 void  EffacerEcran();																																				// Efface l'écran
 void  SetCursor(int,int);																																		// Permet de placer le curseur à une coordonnée (x,y) 
-void  GetConsoleDimensions(unsigned int*,unsigned int*);																		// Permet de récupérer les dimensions d'une console (devrait fonctionner sur Windows)
+void  GetConsoleDimensions(unsigned short*,unsigned short*);																		// Permet de récupérer les dimensions d'une console (devrait fonctionner sur Windows)
 
 // Ajouté le 19 octobre 2014
 
